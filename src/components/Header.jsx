@@ -3,8 +3,9 @@ import { Download } from 'lucide-react';
 
 const Header = () => {
   return (
-    <header className="w-full max-w-6xl py-6 flex items-center justify-between z-10 relative">
-      <div className="flex flex-col">
+    <header className="w-full py-4 px-6 md:px-12 flex justify-center z-50 sticky top-0 bg-background/80 backdrop-blur-md border-b border-white/5">
+      <div className="w-full max-w-[1440px] flex items-center justify-between">
+        <div className="flex flex-col">
         <span className="text-xl font-bold tracking-tight">
           Năng Đỗ
         </span>
@@ -24,6 +25,7 @@ const Header = () => {
       <button className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-all glass-panel text-sm font-medium">
         TẢI CV <Download size={16} />
       </button>
+      </div>
     </header>
   );
 };

@@ -14,7 +14,7 @@ export default function Stats() {
       <div className="glass-panel border-white/5 rounded-2xl p-8 flex flex-wrap gap-8 justify-between items-center bg-gradient-to-r from-surfaceLight to-surface/40">
         {stats.map((stat, index) => (
           <div key={index} className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
+            <div className="flex items-center justify-center">
               {stat.icon}
             </div>
             <div>

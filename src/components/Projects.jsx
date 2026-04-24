@@ -4,12 +4,11 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 const categories = ['Tất cả', 'Poster', 'Banner', 'Social Media', 'Branding', 'Thumbnail', 'Others'];
 
 const projects = [
-  { id: 1, title: 'Poster Quảng Cáo Đồ Ăn', category: 'Poster Design', color: 'bg-red-900/50' },
-  { id: 2, title: 'Banner Khuyến Mãi', category: 'Banner Design', color: 'bg-green-900/50' },
-  { id: 3, title: 'Bộ Nhận Diện Thương Hiệu', category: 'Branding Design', color: 'bg-emerald-900/50' },
-  { id: 4, title: 'Social Post Facebook', category: 'Social Media Design', color: 'bg-blue-900/50' },
-  { id: 5, title: 'Thumbnail YouTube', category: 'Thumbnail Design', color: 'bg-slate-800' },
-  { id: 6, title: 'Cover TikTok', category: 'Cover Design', color: 'bg-purple-900/50' },
+  { id: 1, title: 'Poster Quảng Cáo Đồ Ăn', category: 'Poster Design', color: 'bg-red-900/50', image: '' },
+  { id: 2, title: 'Banner Khuyến Mãi', category: 'Banner Design', color: 'bg-green-900/50', image: '' },
+  { id: 3, title: 'Bộ Nhận Diện Thương Hiệu', category: 'Branding Design', color: 'bg-emerald-900/50', image: '' },
+  { id: 4, title: 'Social Post Facebook', category: 'Social Media Design', color: 'bg-blue-900/50', image: '' },
+  { id: 5, title: 'Thumbnail YouTube', category: 'Thumbnail Design', color: 'bg-slate-800', image: '' },
 ];
 
 export default function Projects() {
@@ -43,11 +42,12 @@ export default function Projects() {
       </div>
 
       <div className="relative group">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 xl:gap-6">
           {projects.map((project) => (
             <div key={project.id} className="flex flex-col gap-3 group/card cursor-pointer glass-panel-hover p-3 rounded-2xl border border-white/5 bg-surfaceLight/50">
               <div className={`w-full aspect-[3/4] rounded-xl ${project.color} overflow-hidden relative border border-white/10 shadow-inner`}>
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 z-10" />
+                 {project.image && <img src={project.image} alt={project.title} className="w-full h-full object-cover" />}
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 z-10" />
                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 bg-black/40 backdrop-blur-sm transition-all duration-300 z-20">
                     <div className="w-12 h-12 bg-primary/80 rounded-full flex items-center justify-center shadow-glow text-white transform scale-50 group-hover/card:scale-100 transition-transform duration-300">
                       <div className="w-0 h-0 border-t-6 border-t-transparent border-l-10 border-l-white border-b-6 border-b-transparent ml-1" />
