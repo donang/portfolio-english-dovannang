@@ -219,10 +219,10 @@ export default function Hero() {
       `}</style>
 
       {/* --- CỤM BÊN PHẢI: ĐỒ HOẠ TRUNG TÂM (HIỆU ỨNG POP-OUT AVATAR 3D) --- */}
-      <div className="relative w-full h-[550px] lg:h-[750px] flex items-center justify-center lg:justify-end lg:pr-[6%] xl:pr-[12%] 2xl:pr-[15%] mt-8 lg:mt-0 z-0">
+      <div className="relative w-full h-[480px] sm:h-[550px] lg:h-[750px] flex items-center justify-center lg:justify-end lg:pr-[6%] xl:pr-[12%] 2xl:pr-[15%] mt-0 md:mt-8 lg:mt-0 z-0">
 
         {/* KHÔNG GIAN BẤT BIẾN - 500x500 */}
-        <div className="relative w-[340px] h-[340px] md:w-[420px] md:h-[420px] lg:w-[500px] lg:h-[500px] scale-[1.05] md:scale-[1.1] lg:scale-[1.15] xl:scale-[1.2] origin-center lg:origin-right">
+        <div className="relative w-[340px] h-[340px] md:w-[420px] md:h-[420px] lg:w-[500px] lg:h-[500px] scale-[0.85] sm:scale-100 md:scale-[1.1] lg:scale-[1.15] xl:scale-[1.2] origin-center lg:origin-right">
 
           {/* Lớp Vũ trụ tổng (Glows sau cùng) */}
           <div className="absolute top-[20%] left-[20%] w-[120%] h-[120%] rounded-full bg-gradient-to-br from-[#ff2a85]/15 via-[#7000FF]/10 to-transparent blur-[60px] z-[0] -translate-x-[20%] -translate-y-[20%]" />
