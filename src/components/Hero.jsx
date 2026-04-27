@@ -216,6 +216,13 @@ export default function Hero() {
           0% { transform: rotate(45deg) translateY(-100%); }
           30%, 100% { transform: rotate(45deg) translateY(100%); }
         }
+        
+        /* TẮT CẤP TỐC CÁC ANIMATION HẠNG NẶNG TRÊN ĐIỆN THOẠI ĐỂ CHỐNG GIẬT LAG */
+        @media (max-width: 768px) {
+          .hover-scale-3d { animation: none !important; transform: rotateX(-15deg) rotateY(35deg) rotateZ(5deg) !important; }
+          .cube-face-sparkle::after { animation: none !important; display: none !important; }
+          [style*="flag-flutter"] { animation: none !important; transform: rotate(0deg) !important; }
+        }
       `}</style>
 
       {/* --- CỤM BÊN PHẢI: ĐỒ HOẠ TRUNG TÂM (HIỆU ỨNG POP-OUT AVATAR 3D) --- */}
@@ -278,7 +285,7 @@ export default function Hero() {
           </div>
 
           {/* Lớp z-30: VÒNG NEON VIỀN SẮC NÉT - Vẽ vòng nhẫn chụp lên cắt đôi khung hình */}
-          <div className="absolute inset-0 scale-[0.80] translate-y-[12%] rounded-full border-[2.5px] border-transparent z-30 pointer-events-none mix-blend-screen transition-all duration-500"
+          <div className="hidden md:block absolute inset-0 scale-[0.80] translate-y-[12%] rounded-full border-[2.5px] border-transparent z-30 pointer-events-none mix-blend-screen transition-all duration-500"
             style={{
               background: 'linear-gradient(135deg, #ff2a85 0%, #b266ff 40%, #00c3ff 100%) border-box',
               WebkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
@@ -286,6 +293,8 @@ export default function Hero() {
               maskComposite: 'exclude'
             }}
           />
+          {/* Mobile Fallback: Vòng neon tĩnh sương sương, loại bỏ thuật toán Mask phức tạp */}
+          <div className="block md:hidden absolute inset-0 scale-[0.80] translate-y-[12%] rounded-full border-[2px] border-[#b266ff]/60 z-30 pointer-events-none" />
 
           {/* Lớp z-40: HEAD LAYER - Phần đầu (Tóc) đâm xuyên phá vỡ vòng Neon */}
           <div className="absolute inset-0 z-40 pointer-events-none" style={{ clipPath: 'polygon(-50% -50%, 150% -50%, 150% 35%, -50% 35%)' }}>
