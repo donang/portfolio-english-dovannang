@@ -1,30 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 
 const Header = () => {
+  const [activeSection, setActiveSection] = useState('home');
+
+  useEffect(() => {
+    const sections = ['home', 'projects', 'skills', 'about', 'contact'];
+    
+    // IntersectionObserver is lightweight and zero-lag compared to window.onScroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, {
+      rootMargin: '-20% 0px -80% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(section => {
+      const el = document.getElementById(section);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleClick = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const topOffset = element.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({
+        top: topOffset,
+        behavior: 'smooth'
+      });
+      // observer handles the active state automatically
+    } else {
+      window.location.href = `/#${targetId}`;
+    }
+  };
+
+  const getLinkClass = (sectionId) => {
+    const isActive = activeSection === sectionId;
+    return `transition-all text-sm font-semibold relative py-2 ${
+      isActive ? "" : "text-textMuted hover:text-white"
+    }`;
+  };
+
+  const getTextStyle = (sectionId) => {
+    return activeSection === sectionId ? "bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400" : "";
+  };
+
+  const activeIndicator = (isActive) => isActive ? (
+    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full shadow-[0_0_8px_rgba(255,42,133,0.8)]" />
+  ) : null;
+
   return (
-    <header className="w-full py-4 px-6 md:px-12 flex justify-center z-50 sticky top-0 bg-background/80 backdrop-blur-md border-b border-white/5">
-      <div className="w-full max-w-[1440px] flex items-center justify-between">
-        <div className="flex flex-col">
-        <span className="text-xl font-bold tracking-tight">
-          Năng Đỗ
-        </span>
-        <span className="text-xs text-textMuted uppercase tracking-widest mt-[-2px]">
+    <header className="w-full flex justify-center z-50 sticky top-0 transition-all pt-2">
+      {/* Trong suốt hoàn toàn theo yêu cầu */}
+      
+      <div className="w-full max-w-[1440px] py-4 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 relative z-10">
+        <div className="flex flex-col items-start w-full md:w-auto">
+        <div className="flex items-center gap-1.5">
+            <span className="text-[28px] font-bold tracking-tight font-sans text-white leading-tight">
+               Đỗ Văn
+            </span>
+            <span className="text-[28px] font-bold tracking-tight font-sans bg-clip-text text-transparent bg-gradient-to-br from-purple-400 to-primary leading-tight pr-2 py-1">
+               Năng
+            </span>
+        </div>
+        <span className="text-[10px] text-textMuted uppercase tracking-[0.2em] font-medium leading-none lg:-mt-1">
           Graphic Designer
         </span>
       </div>
 
-      <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href="#home" className="text-primary relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-primary after:rounded-full">Trang chủ</a>
-        <a href="#projects" className="text-textMuted hover:text-white transition-colors">Dự án</a>
-        <a href="#skills" className="text-textMuted hover:text-white transition-colors">Kỹ năng</a>
-        <a href="#about" className="text-textMuted hover:text-white transition-colors">Về mình</a>
-        <a href="#contact" className="text-textMuted hover:text-white transition-colors">Liên hệ</a>
+      <nav className="flex items-center gap-8 md:gap-10 text-sm overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 md:px-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+        <a href="#home" onClick={(e) => handleClick(e, 'home')} className={getLinkClass('home')}>
+          <span className={getTextStyle('home')}>Trang chủ</span>
+          {activeIndicator(activeSection === 'home')}
+        </a>
+
+        <a href="#projects" onClick={(e) => handleClick(e, 'projects')} className={getLinkClass('projects')}>
+          <span className={getTextStyle('projects')}>Dự án</span>
+          {activeIndicator(activeSection === 'projects')}
+        </a>
+
+        <a href="#skills" onClick={(e) => handleClick(e, 'skills')} className={getLinkClass('skills')}>
+          <span className={getTextStyle('skills')}>Kỹ năng</span>
+          {activeIndicator(activeSection === 'skills')}
+        </a>
+
+        <a href="#about" onClick={(e) => handleClick(e, 'about')} className={getLinkClass('about')}>
+          <span className={getTextStyle('about')}>Về mình</span>
+          {activeIndicator(activeSection === 'about')}
+        </a>
+
+        <a href="#contact" onClick={(e) => handleClick(e, 'contact')} className={getLinkClass('contact')}>
+          <span className={getTextStyle('contact')}>Liên hệ</span>
+          {activeIndicator(activeSection === 'contact')}
+        </a>
       </nav>
 
-      <button className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-all glass-panel text-sm font-medium">
-        TẢI CV <Download size={16} />
-      </button>
+      <div className="hidden md:flex justify-end w-auto min-w-[200px]">
+        <button className="flex items-center text-white rounded-xl text-[11px] font-semibold px-6 py-2.5 transition-all shadow-[0_0_20px_rgba(112,0,255,0.15)] border border-purple-500/50 hover:bg-white/5">
+          TẢI CV <Download size={14} className="ml-2 opacity-80" />
+        </button>
+      </div>
       </div>
     </header>
   );
