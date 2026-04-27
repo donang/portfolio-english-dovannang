@@ -36,7 +36,7 @@ export default function Stats() {
 
   return (
     <section className="w-full relative z-30 -mt-4 md:-mt-10 lg:-mt-16 xl:-mt-20 max-w-5xl mx-auto px-4 lg:px-0">
-      <div className="bg-[#0b0c10] border border-white/5 rounded-2xl px-4 md:px-12 py-6 md:py-8 grid grid-cols-2 md:flex md:flex-row gap-y-8 gap-x-2 md:gap-8 justify-between items-center shadow-2xl">
+      <div className="bg-[#0b0c10] border border-white/5 rounded-2xl px-4 md:px-12 py-5 md:py-8 grid grid-cols-2 md:flex md:flex-row gap-y-5 gap-x-1 md:gap-8 justify-between items-center shadow-2xl">
         {statsRender.map((stat, index) => (
           <div key={index} className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full md:w-auto md:border-r border-white/5 last:border-0 md:pr-10 last:pr-0 justify-center text-center md:text-left">
             <div className="flex items-center justify-center p-0 transition-transform">

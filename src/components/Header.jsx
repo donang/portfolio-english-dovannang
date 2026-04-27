@@ -76,28 +76,28 @@ const Header = () => {
         </span>
       </div>
 
-      <nav className="flex items-center gap-8 md:gap-10 text-sm overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 md:px-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
-        <a href="#home" onClick={(e) => handleClick(e, 'home')} className={getLinkClass('home')}>
+      <nav className="flex items-center flex-nowrap gap-6 md:gap-10 text-[13px] md:text-sm overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 md:px-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+        <a href="#home" onClick={(e) => handleClick(e, 'home')} className={`whitespace-nowrap shrink-0 ${getLinkClass('home')}`}>
           <span className={getTextStyle('home')}>Trang chủ</span>
           {activeIndicator(activeSection === 'home')}
         </a>
 
-        <a href="#projects" onClick={(e) => handleClick(e, 'projects')} className={getLinkClass('projects')}>
+        <a href="#projects" onClick={(e) => handleClick(e, 'projects')} className={`whitespace-nowrap shrink-0 ${getLinkClass('projects')}`}>
           <span className={getTextStyle('projects')}>Dự án</span>
           {activeIndicator(activeSection === 'projects')}
         </a>
 
-        <a href="#skills" onClick={(e) => handleClick(e, 'skills')} className={getLinkClass('skills')}>
+        <a href="#skills" onClick={(e) => handleClick(e, 'skills')} className={`whitespace-nowrap shrink-0 ${getLinkClass('skills')}`}>
           <span className={getTextStyle('skills')}>Kỹ năng</span>
           {activeIndicator(activeSection === 'skills')}
         </a>
 
-        <a href="#about" onClick={(e) => handleClick(e, 'about')} className={getLinkClass('about')}>
+        <a href="#about" onClick={(e) => handleClick(e, 'about')} className={`whitespace-nowrap shrink-0 ${getLinkClass('about')}`}>
           <span className={getTextStyle('about')}>Về mình</span>
           {activeIndicator(activeSection === 'about')}
         </a>
 
-        <a href="#contact" onClick={(e) => handleClick(e, 'contact')} className={getLinkClass('contact')}>
+        <a href="#contact" onClick={(e) => handleClick(e, 'contact')} className={`whitespace-nowrap shrink-0 ${getLinkClass('contact')}`}>
           <span className={getTextStyle('contact')}>Liên hệ</span>
           {activeIndicator(activeSection === 'contact')}
         </a>
