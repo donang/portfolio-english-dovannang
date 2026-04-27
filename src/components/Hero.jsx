@@ -142,7 +142,7 @@ export default function Hero() {
         </div>
 
         {/* Social Icons */}
-        <div className="flex items-center justify-center lg:justify-start gap-3 mt-7 xl:mt-9 w-full">
+        <div className="flex items-center justify-center lg:justify-start gap-3 mt-4 md:mt-7 xl:mt-9 w-full">
           {[
             { id: 'be', icon: <span className="font-bold font-serif text-[15px]">Bē</span> },
             { id: 'ig', icon: <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="4" ry="4" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg> },
