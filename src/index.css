@@ -43,7 +43,7 @@
   h4,
   h5,
   h6 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Inter', sans-serif;
     @apply tracking-tight leading-snug;
   }
 }

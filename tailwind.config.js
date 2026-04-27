@@ -19,7 +19,7 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         heading: ['Inter', 'sans-serif'],
-        script: ['"SVN-Janelotus"', '"Platinum Signature"', 'cursive'],
+        script: ['"SVN-Janelotus"', 'cursive'],
       },
       boxShadow: {
         '3d': '0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1)',
