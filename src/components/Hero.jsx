@@ -240,7 +240,7 @@ export default function Hero() {
             <div className="p-[2.5px] rounded-[18px] bg-gradient-to-tr from-[#ffffff] via-[#ff9a00] to-[#ffffff] shadow-[0_20px_40px_rgba(0,0,0,0.8),0_0_30px_rgba(255,145,77,0.3)] origin-center"
               style={{ animation: 'flag-flutter 4.5s ease-in-out infinite alternate' }}>
               <div className="rounded-[15px] overflow-hidden">
-                <img src="/images/poster3.png" alt="Burger Poster" className="w-full h-auto object-cover bg-[#2b1810] block" />
+                <img src="./images/poster3.png" alt="Burger Poster" className="w-full h-auto object-cover bg-[#2b1810] block" />
               </div>
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function Hero() {
               clipPath: 'circle(40% at 50% 62%)'
             }}>
             <img
-              src="/images/portrait.png?v=2"
+              src="./images/portrait.png?v=2"
               className="absolute -bottom-[8%] left-1/2 -translate-x-1/2 h-[125%] w-auto max-w-none object-contain pointer-events-none transition-all duration-500"
               style={{ filter: 'drop-shadow(0 0 6px rgba(5,5,15,0.9)) drop-shadow(0 0 2px rgba(5,5,15,0.9))' }}
             />
@@ -291,7 +291,7 @@ export default function Hero() {
           {/* Lớp z-40: HEAD LAYER - Phần đầu (Tóc) đâm xuyên phá vỡ vòng Neon */}
           <div className="absolute inset-0 z-40 pointer-events-none" style={{ clipPath: 'polygon(-50% -50%, 150% -50%, 150% 35%, -50% 35%)' }}>
             <img
-              src="/images/portrait.png?v=2"
+              src="./images/portrait.png?v=2"
               className="absolute -bottom-[8%] left-1/2 -translate-x-1/2 h-[125%] w-auto max-w-none object-contain pointer-events-none transition-all duration-500"
               style={{ filter: 'drop-shadow(0 0 6px rgba(5,5,15,0.9)) drop-shadow(0 0 2px rgba(5,5,15,0.9))' }}
             />
@@ -305,7 +305,7 @@ export default function Hero() {
             <div className="p-[2.5px] rounded-[18px] bg-gradient-to-tr from-[#ffffff] via-[#ff2a85] to-[#ffffff] shadow-[0_30px_60px_rgba(0,0,0,0.9),0_0_30px_rgba(255,42,133,0.3)] origin-center"
               style={{ animation: 'flag-flutter 3.5s ease-in-out infinite alternate' }}>
               <div className="rounded-[15px] overflow-hidden">
-                <img src="/images/poster1.png" alt="Flash Sale" className="w-full h-auto object-cover bg-[#0d0722] block" />
+                <img src="./images/poster1.png" alt="Flash Sale" className="w-full h-auto object-cover bg-[#0d0722] block" />
               </div>
             </div>
           </div>
@@ -316,7 +316,7 @@ export default function Hero() {
             <div className="p-[2.5px] rounded-[18px] bg-gradient-to-tr from-[#ffffff] via-[#00c3ff] to-[#ffffff] shadow-[0_30px_60px_rgba(0,0,0,0.9),0_0_30px_rgba(0,195,255,0.3)] origin-center"
               style={{ animation: 'flag-flutter 5s ease-in-out infinite alternate' }}>
               <div className="rounded-[15px] overflow-hidden">
-                <img src="/images/poster2.png" alt="Lemonade" className="w-full h-auto object-cover bg-[#0a2e1d] block" />
+                <img src="./images/poster2.png" alt="Lemonade" className="w-full h-auto object-cover bg-[#0a2e1d] block" />
               </div>
             </div>
           </div>
