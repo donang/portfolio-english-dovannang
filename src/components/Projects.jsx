@@ -21,6 +21,18 @@ export default function Projects({ limit }) {
   const [selectedLightboxProject, setSelectedLightboxProject] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showAllOverlay, setShowAllOverlay] = useState(false);
+  const [slideDirection, setSlideDirection] = useState('none'); // 'left' | 'right' | 'none'
+
+  // Preload adjacent images for instant navigation
+  useEffect(() => {
+    if (!selectedLightboxProject?.images?.length) return;
+    const imgs = selectedLightboxProject.images;
+    const toPreload = [1, 2, -1].map(offset => (currentImageIndex + offset + imgs.length) % imgs.length);
+    toPreload.forEach(idx => {
+      const img = new window.Image();
+      img.src = imgs[idx];
+    });
+  }, [selectedLightboxProject, currentImageIndex]);
 
   useEffect(() => {
     const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
@@ -115,12 +127,32 @@ export default function Projects({ limit }) {
           from { opacity: 0; transform: scale(0.95) translateY(20px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
+        @keyframes slideFromRight {
+          from { opacity: 0; transform: translate3d(60px, 0, 0) scale(0.97); }
+          to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        }
+        @keyframes slideFromLeft {
+          from { opacity: 0; transform: translate3d(-60px, 0, 0) scale(0.97); }
+          to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        }
         .gallery-item {
           opacity: 0;
           animation: galleryFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .modal-frame {
           animation: modalScaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .slide-right {
+          animation: slideFromRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .slide-left {
+          animation: slideFromLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .slide-none {
+          animation: slideFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
         }
       `}</style>
 
@@ -143,8 +175,8 @@ export default function Projects({ limit }) {
             key={cat}
             onClick={() => setActiveTab(cat)}
             className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-bold transition-all ${activeTab === cat
-                ? 'bg-gradient-to-r from-purple-600 to-primary text-white shadow-[0_0_20px_rgba(255,42,133,0.4)]'
-                : 'bg-white/5 text-textMuted hover:text-white hover:bg-white/10 ring-1 ring-inset ring-white/5'
+              ? 'bg-gradient-to-r from-purple-600 to-primary text-white shadow-[0_0_20px_rgba(255,42,133,0.4)]'
+              : 'bg-white/5 text-textMuted hover:text-white hover:bg-white/10 ring-1 ring-inset ring-white/5'
               }`}
           >
             {cat}
@@ -165,14 +197,6 @@ export default function Projects({ limit }) {
             </div>
           ))}
         </div>
-
-        {/* Navigation Arrows (Hiding them safely outside the content box to avoid overlapping) */}
-        <button aria-label="Previous Project" className="absolute -left-6 xl:-left-8 top-1/3 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#0f1118]/80 backdrop-blur-md ring-1 ring-inset ring-white/10 hover:bg-white/10 hover:ring-white/20 text-white z-20 hidden lg:flex hover:scale-110 transition-all shadow-lg">
-          <ChevronLeft size={20} />
-        </button>
-        <button aria-label="Next Project" className="absolute -right-6 xl:-right-8 top-1/3 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[#0f1118]/80 backdrop-blur-md ring-1 ring-inset ring-white/10 hover:bg-white/10 hover:ring-white/20 text-white z-20 hidden lg:flex hover:scale-110 transition-all shadow-lg">
-          <ChevronRight size={20} />
-        </button>
       </div>
 
       {/* Lightbox Pop-up with Carousel navigation */}
@@ -201,7 +225,7 @@ export default function Projects({ limit }) {
                 autoFocus
                 aria-label="Previous Image"
                 className="absolute left-4 md:left-12 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
-                onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(prev => prev === 0 ? selectedLightboxProject.images.length - 1 : prev - 1) }}
+                onClick={(e) => { e.stopPropagation(); setSlideDirection('left'); setCurrentImageIndex(prev => prev === 0 ? selectedLightboxProject.images.length - 1 : prev - 1) }}
               >
                 <ChevronLeft size={28} />
               </button>
@@ -212,8 +236,23 @@ export default function Projects({ limit }) {
               src={selectedLightboxProject.images?.[currentImageIndex] || selectedLightboxProject.imageUrl || selectedLightboxProject.image}
               alt="Fullscreen Preview"
               loading="eager"
-              className="max-w-full max-h-full object-contain rounded-2xl shadow-3d opacity-0 transition-opacity duration-500 pointer-events-auto cursor-default scale-95"
-              onLoad={(e) => { e.target.classList.remove('opacity-0'); e.target.classList.remove('scale-95'); e.target.classList.add('scale-100'); }}
+              className={`max-w-[90vw] max-h-[85vh] object-contain rounded-2xl shadow-3d pointer-events-auto cursor-default slide-${slideDirection}`}
+              onLoad={(e) => {
+                const img = e.target;
+                const vw = window.innerWidth * 0.9;
+                const vh = window.innerHeight * 0.85;
+                const imgRatio = img.naturalWidth / img.naturalHeight;
+                const viewRatio = vw / vh;
+                
+                // If image is wider relative to viewport, limit by width. Otherwise limit by height.
+                if (imgRatio > viewRatio) {
+                  img.style.width = '90vw';
+                  img.style.height = 'auto';
+                } else {
+                  img.style.height = '85vh';
+                  img.style.width = 'auto';
+                }
+              }}
               onClick={(e) => e.stopPropagation()}
             />
 
@@ -221,7 +260,7 @@ export default function Projects({ limit }) {
               <button
                 aria-label="Next Image"
                 className="absolute right-4 md:right-12 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
-                onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(prev => prev === selectedLightboxProject.images.length - 1 ? 0 : prev + 1) }}
+                onClick={(e) => { e.stopPropagation(); setSlideDirection('right'); setCurrentImageIndex(prev => prev === selectedLightboxProject.images.length - 1 ? 0 : prev + 1) }}
               >
                 <ChevronRight size={28} />
               </button>
@@ -270,8 +309,8 @@ export default function Projects({ limit }) {
                       key={'modal-' + cat}
                       onClick={() => setActiveTab(cat)}
                       className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-xs md:text-sm font-bold transition-all ${activeTab === cat
-                          ? 'bg-gradient-to-r from-purple-600 to-primary text-white shadow-[0_0_20px_rgba(255,42,133,0.4)]'
-                          : 'bg-white/5 text-textMuted hover:text-white hover:bg-white/10 ring-1 ring-inset ring-white/5'
+                        ? 'bg-gradient-to-r from-purple-600 to-primary text-white shadow-[0_0_20px_rgba(255,42,133,0.4)]'
+                        : 'bg-white/5 text-textMuted hover:text-white hover:bg-white/10 ring-1 ring-inset ring-white/5'
                         }`}
                     >
                       {cat}

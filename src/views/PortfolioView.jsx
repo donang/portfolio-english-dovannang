@@ -6,7 +6,6 @@ import Projects from '../components/Projects';
 import SkillsAboutContact from '../components/SkillsAboutContact';
 import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
-import SnakeEasterEgg from '../components/SnakeEasterEgg';
 
 export default function PortfolioView() {
   return (
@@ -14,12 +13,15 @@ export default function PortfolioView() {
       {/* Premium Artisan Background Effects */}
       <style>{`
         @keyframes grid-pan {
-          0% { background-position: 0% 0%; }
-          100% { background-position: 80px 80px; }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(80px, 80px, 0); }
         }
         .animated-grid {
           position: fixed;
-          inset: 0;
+          top: -80px;
+          left: -80px;
+          right: -80px;
+          bottom: -80px;
           z-index: 0;
           pointer-events: none;
           background-size: 80px 80px;
@@ -28,14 +30,15 @@ export default function PortfolioView() {
             linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
           mask-image: radial-gradient(ellipse at top center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
           animation: grid-pan 15s linear infinite;
+          will-change: transform;
         }
 
         @keyframes meteor-shower {
-          0% { transform: translate(0, 0) rotate(145deg) scaleX(1); opacity: 0; }
+          0% { transform: translate3d(0, 0, 0) rotate(145deg) scaleX(1); opacity: 0; }
           3% { opacity: 1; }
           12% { opacity: 1; }
-          25% { transform: translate(-1500px, 1000px) rotate(145deg) scaleX(0.1); opacity: 0; }
-          100% { transform: translate(-1500px, 1000px) rotate(145deg) scaleX(0); opacity: 0; }
+          25% { transform: translate3d(-1500px, 1000px, 0) rotate(145deg) scaleX(0.1); opacity: 0; }
+          100% { transform: translate3d(-1500px, 1000px, 0) rotate(145deg) scaleX(0); opacity: 0; }
         }
         .meteor {
           position: fixed;
@@ -46,22 +49,24 @@ export default function PortfolioView() {
           opacity: 0;
           pointer-events: none;
           z-index: 0;
+          will-change: transform, opacity;
         }
         .meteor-1 { top: -10%; left: 50%; animation: meteor-shower 10s linear infinite 2s; }
         .meteor-2 { top: 10%; left: 100%; animation: meteor-shower 15s linear infinite 5s; width: 200px; filter: drop-shadow(0 0 15px #00c3ff); }
         .meteor-3 { top: -20%; left: 80%; animation: meteor-shower 12s linear infinite 9s; filter: drop-shadow(0 0 10px #7000FF); }
         .meteor-4 { top: 30%; left: 110%; animation: meteor-shower 18s linear infinite 14s; width: 180px; filter: drop-shadow(0 0 12px #ff9a00); }
         .meteor-5 { top: -5%; left: 120%; animation: meteor-shower 9s linear infinite 4s; width: 250px; }
-        
-        @keyframes snake-serpentine-bob {
-          0%, 100% { transform: translateY(-5px) rotate(2deg); }
-          50% { transform: translateY(5px) rotate(-2deg); }
-        }
-        @keyframes snake-journey {
-          0%, 75% { left: 110vw; opacity: 0; }
-          76% { left: 110vw; opacity: 1; }
-          95% { left: -20vw; opacity: 1; }
-          96%, 100% { left: -20vw; opacity: 0; }
+
+        /* Mobile Optimization: Stop heavy animations to prevent phone overheating */
+        @media (max-width: 768px) {
+          .meteor {
+            display: none !important;
+            animation: none !important;
+          }
+          .animated-grid {
+            animation: none !important;
+            opacity: 0.7;
+          }
         }
         
         .space-core {
@@ -95,9 +100,6 @@ export default function PortfolioView() {
       <div className="meteor meteor-3"></div>
       <div className="meteor meteor-4"></div>
       <div className="meteor meteor-5"></div>
-
-      {/* Component Easter Egg Rắn Tương Tác Vật Lý */}
-      <SnakeEasterEgg />
       
       <Header />
       <div className="w-full flex justify-center relative z-10 px-4 md:px-12">

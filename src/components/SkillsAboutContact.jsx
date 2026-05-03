@@ -21,8 +21,8 @@ const SolarSystem3D = ({ skills }) => {
   return (
     <div className="relative w-full aspect-square max-w-[600px] mx-auto mt-8 overflow-visible">
       <style>{`
-        @keyframes orbitSpinZ { 100% { transform: rotateZ(360deg); } }
-        @keyframes orbitSpinZRev { 100% { transform: rotateZ(-360deg); } }
+        @keyframes orbitSpinZ { 100% { transform: rotateZ(360deg) translateZ(0); } }
+        @keyframes orbitSpinZRev { 100% { transform: rotateZ(-360deg) translateZ(0); } }
         
         .star-field {
            background-image: 
@@ -34,6 +34,12 @@ const SolarSystem3D = ({ skills }) => {
              radial-gradient(2px 2px at 250px 150px, rgba(255,255,255,0.8), rgba(0,0,0,0));
            background-size: 300px 300px;
         }
+
+        /* Mobile Optimization for Battery & Heat */
+        @media (max-width: 768px) {
+          .sun-rays { display: none !important; }
+          .sun-glow { animation: none !important; box-shadow: 0 0 40px #ff9800 !important; }
+        }
       `}</style>
       
       {/* 2D Flat Space Plane */}
@@ -41,20 +47,21 @@ const SolarSystem3D = ({ skills }) => {
         
         {/* Lõi Mặt Trời Rực Lửa (Siêu Thực - Theo Mẫu) */}
         <div className="absolute top-1/2 left-1/2 w-[65px] h-[65px] md:w-[85px] md:h-[85px] rounded-full flex items-center justify-center z-10" 
-             style={{ transform: 'translate(-50%, -50%)' }}>
+             style={{ transform: 'translate(-50%, -50%) translateZ(0)' }}>
              
            {/* Hào quang tỏa tia (Cosmic Sun Rays) - Giả lập các luồng ánh sáng bắn ra ngoài không gian */}
-           <div className="absolute top-1/2 left-1/2 w-[280%] h-[280%] rounded-full opacity-50 mix-blend-screen pointer-events-none"
+           <div className="sun-rays absolute top-1/2 left-1/2 w-[280%] h-[280%] rounded-full opacity-50 mix-blend-screen pointer-events-none"
                 style={{
-                   transform: 'translate(-50%, -50%)',
+                   transform: 'translate(-50%, -50%) translateZ(0)',
                    background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,165,0,0.6) 15deg, transparent 30deg, rgba(255,235,59,0.4) 45deg, transparent 60deg, rgba(255,140,0,0.7) 75deg, transparent 100deg, rgba(255,165,0,0.5) 120deg, transparent 150deg, rgba(255,69,0,0.6) 175deg, transparent 200deg, rgba(255,235,59,0.4) 240deg, transparent 270deg, rgba(255,140,0,0.7) 300deg, transparent 330deg, rgba(255,165,0,0.6) 345deg, transparent 360deg)',
                    filter: 'blur(3px)',
                    WebkitMaskImage: 'radial-gradient(circle at center, black 20%, transparent 70%)',
                    maskImage: 'radial-gradient(circle at center, black 20%, transparent 70%)',
+                   willChange: 'transform'
                 }}></div>
 
            {/* Vầng sáng vàng lóa nhấp nháy bao quanh rìa */}
-           <div className="absolute inset-[-10px] rounded-full blur-[6px]" style={{ boxShadow: '0 0 30px #ffeb3b, 0 0 60px #ff9800, 0 0 100px #ff5722', animation: 'sunPulse3D 2s infinite alternate' }}></div>
+           <div className="sun-glow absolute inset-[-10px] rounded-full blur-[6px]" style={{ boxShadow: '0 0 30px #ffeb3b, 0 0 60px #ff9800, 0 0 100px #ff5722', animation: 'sunPulse3D 2s infinite alternate', willChange: 'box-shadow' }}></div>
 
            {/* Ảnh Mặt Trời gốc (Đã được Color Grade đổi sang Vàng/Cam rực rỡ y hệt ảnh mẫu) */}
            <div className="relative w-full h-full rounded-full overflow-hidden shadow-[inset_0_0_20px_#ff9800]">

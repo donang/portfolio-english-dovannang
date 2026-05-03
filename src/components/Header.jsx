@@ -58,23 +58,33 @@ const Header = () => {
   ) : null;
 
   return (
-    <header className="relative w-full flex justify-center z-[100] transition-all pt-2 md:sticky md:top-0 md:w-full">
+    <header className="relative w-full flex justify-center z-[100] transition-all pt-2 md:sticky md:top-0 md:w-full px-4 md:px-12">
       {/* Trong suốt hoàn toàn theo yêu cầu */}
       
-      <div className="w-full max-w-[1440px] py-4 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 relative z-10">
-        <div className="flex flex-col items-start w-full md:w-auto">
-        <div className="flex items-center gap-1.5">
-            <span className="text-[22px] md:text-[28px] font-bold tracking-tight font-sans text-white leading-tight">
-               Đỗ Văn
+      <div className="w-full max-w-[1440px] py-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 relative z-10">
+        <div className="flex items-center justify-start w-full md:w-auto gap-3 shrink-0">
+          {/* AI Generated Pure Logo N */}
+          <div className="flex items-center justify-center shrink-0 pr-1 group cursor-pointer">
+            <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[10px] md:rounded-xl overflow-hidden shadow-[0_2px_15px_rgba(255,42,133,0.3)] group-hover:shadow-[0_4px_20px_rgba(255,42,133,0.6)] group-hover:scale-105 transition-all duration-300 border border-white/10 flex items-center justify-center">
+              <img src="/logo_n.png" alt="Đỗ Văn Năng Logo" className="w-full h-full object-cover scale-[1.15]" />
+            </div>
+          </div>
+          
+          {/* Tên & Vị trí */}
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-1.5 -mb-0.5">
+                <span className="text-[18px] md:text-[22px] font-bold tracking-tight font-sans text-white leading-tight">
+                   Đỗ Văn
+                </span>
+                <span className="text-[18px] md:text-[22px] font-bold tracking-tight font-sans bg-clip-text text-transparent bg-gradient-to-br from-purple-400 to-primary leading-tight pr-1 py-1">
+                   Năng
+                </span>
+            </div>
+            <span className="text-[8px] md:text-[9.5px] text-textMuted uppercase tracking-[0.25em] font-bold leading-none lg:-mt-0.5">
+              Graphic Designer
             </span>
-            <span className="text-[22px] md:text-[28px] font-bold tracking-tight font-sans bg-clip-text text-transparent bg-gradient-to-br from-purple-400 to-primary leading-tight pr-2 py-1">
-               Năng
-            </span>
+          </div>
         </div>
-        <span className="text-[9px] md:text-[10px] text-textMuted uppercase tracking-[0.2em] font-medium leading-none lg:-mt-1">
-          Graphic Designer
-        </span>
-      </div>
 
       <nav className="flex items-center flex-nowrap gap-6 md:gap-10 text-[13px] md:text-sm overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 md:px-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
         <a href="#home" onClick={(e) => handleClick(e, 'home')} className={`whitespace-nowrap shrink-0 ${getLinkClass('home')}`}>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Star, LayoutGrid, PenTool, ThumbsUp, Loader2 } from 'lucide-react';
+import { Star, LayoutGrid, ThumbsUp, Users } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function Stats() {
   const defaultStats = {
-    years: '3+', projects: '20+', clients: '5+', awards: '99%'
+    years: '3+', projects: '150+', clients: '30+', awards: '12+'
   };
 
   const [statsData, setStatsData] = useState(() => {
@@ -29,9 +29,9 @@ export default function Stats() {
 
   const statsRender = [
     { icon: <Star className="text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={26} />, value: statsData.years, label: 'Năm kinh nghiệm' },
-    { icon: <LayoutGrid className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={26} />, value: statsData.projects, label: 'Dự án đã tham gia' },
-    { icon: <PenTool className="text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={26} />, value: statsData.clients, label: 'Công cụ thiết kế' },
-    { icon: <ThumbsUp className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" size={26} />, value: statsData.awards, label: 'Đánh giá tích cực' },
+    { icon: <LayoutGrid className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={26} />, value: statsData.projects, label: 'Dự án hoàn thành' },
+    { icon: <Users className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.6)]" size={26} />, value: statsData.clients, label: 'Khách hàng' },
+    { icon: <ThumbsUp className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" size={26} />, value: statsData.awards, label: 'Đánh giá 5 sao' },
   ];
 
   return (
@@ -39,7 +39,7 @@ export default function Stats() {
       <div className="bg-[#0b0c10] border border-white/5 rounded-2xl px-4 md:px-12 py-5 md:py-8 grid grid-cols-2 md:flex md:flex-row gap-y-5 gap-x-1 md:gap-8 justify-between items-center shadow-2xl">
         {statsRender.map((stat, index) => (
           <div key={index} className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full md:w-auto md:border-r border-white/5 last:border-0 md:pr-10 last:pr-0 justify-center text-center md:text-left">
-            <div className="flex items-center justify-center p-0 transition-transform">
+            <div className="flex items-center justify-center p-0 transition-transform hover:scale-110">
               {stat.icon}
             </div>
             <div className="flex flex-col">
