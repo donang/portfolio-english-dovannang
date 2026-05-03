@@ -41,6 +41,8 @@ export default function AdminView() {
   // Custom Modal State
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'alert', onConfirm: null });
   const [editingProject, setEditingProject] = useState(null);
+  const [selectedImageIndexes, setSelectedImageIndexes] = useState([]);
+  const [showMoveModal, setShowMoveModal] = useState(false);
 
   // Tab State
   const [activeTab, setActiveTab] = useState('portfolio'); // 'portfolio' | 'profile'
@@ -292,7 +294,44 @@ export default function AdminView() {
         const newImages = project.images.filter((_, idx) => idx !== imageIndexToRemove);
         await updateDoc(doc(db, 'projects', project.id), { images: newImages });
         setEditingProject({ ...project, images: newImages });
+        setSelectedImageIndexes(prev => prev.filter(idx => idx !== imageIndexToRemove).map(idx => idx > imageIndexToRemove ? idx - 1 : idx));
     });
+  };
+
+  const handleToggleSelectImage = (idx) => {
+    if (selectedImageIndexes.includes(idx)) {
+      setSelectedImageIndexes(selectedImageIndexes.filter(i => i !== idx));
+    } else {
+      setSelectedImageIndexes([...selectedImageIndexes, idx]);
+    }
+  };
+
+  const handleMoveSelectedImages = async (targetProjectId) => {
+    if (selectedImageIndexes.length === 0 || !targetProjectId) return;
+    try {
+      const urlsToMove = selectedImageIndexes.map(idx => editingProject.images[idx]);
+      const newCurrentImages = editingProject.images.filter((_, idx) => !selectedImageIndexes.includes(idx));
+      
+      const targetProject = projects.find(p => p.id === targetProjectId);
+      const newTargetImages = [...(targetProject.images || []), ...urlsToMove];
+      
+      await updateDoc(doc(db, 'projects', targetProjectId), { images: newTargetImages });
+      
+      if (newCurrentImages.length === 0) {
+         await deleteDoc(doc(db, 'projects', editingProject.id));
+         setEditingProject(null);
+      } else {
+         await updateDoc(doc(db, 'projects', editingProject.id), { images: newCurrentImages });
+         setEditingProject({ ...editingProject, images: newCurrentImages });
+      }
+      
+      setSelectedImageIndexes([]);
+      setShowMoveModal(false);
+      showAlert('Thành công', `Đã chuyển ${urlsToMove.length} ảnh sang dự án khác.`);
+    } catch (err) {
+      console.error(err);
+      showAlert('Lỗi', 'Không thể chuyển ảnh: ' + err);
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -1040,9 +1079,17 @@ export default function AdminView() {
                    </div>
                    <p className="text-white/50 text-[10px] md:text-xs uppercase tracking-[0.3em] font-semibold mt-2">{editingProject.category}</p>
                  </div>
-                 <button onClick={() => setEditingProject(null)} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white">
-                   <span className="font-bold text-xl pointer-events-none">X</span>
-                 </button>
+                 <div className="flex items-center gap-2">
+                   {selectedImageIndexes.length > 0 && (
+                     <button onClick={() => setShowMoveModal(true)} className="px-4 h-12 rounded-2xl bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 border border-blue-500/30 font-semibold text-sm transition-all flex items-center gap-2">
+                       <FolderHeart size={18} />
+                       <span className="whitespace-nowrap">Chuyển {selectedImageIndexes.length} ảnh</span>
+                     </button>
+                   )}
+                   <button onClick={() => { setEditingProject(null); setSelectedImageIndexes([]); setShowMoveModal(false); }} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white">
+                     <span className="font-bold text-xl pointer-events-none">X</span>
+                   </button>
+                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -1071,7 +1118,17 @@ export default function AdminView() {
                         <img src={imgStr} className="w-full h-full object-contain p-2" />
                         
                         {/* Overlay with controls */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/editcard:opacity-100 transition-opacity duration-300">
+                        <div className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${selectedImageIndexes.includes(idx) ? 'opacity-100' : 'opacity-0 group-hover/editcard:opacity-100'}`}>
+                          
+                          {/* Checkbox for selecting */}
+                          <div 
+                            onClick={(e) => { e.stopPropagation(); handleToggleSelectImage(idx); }}
+                            className={`absolute top-3 left-3 w-8 h-8 rounded-xl flex items-center justify-center cursor-pointer transition-all border z-10 ${selectedImageIndexes.includes(idx) ? 'bg-blue-500 border-blue-400 text-white scale-110' : 'bg-black/60 border-white/40 text-transparent hover:border-white/80 hover:text-white/40'}`}
+                            title="Chọn để di chuyển"
+                          >
+                            <CheckCircle2 size={16} />
+                          </div>
+
                           {/* Delete button */}
                           <button 
                              onClick={(e) => { e.stopPropagation(); handleRemoveSingleImage(editingProject, idx); }}
@@ -1087,7 +1144,7 @@ export default function AdminView() {
                               onClick={(e) => { e.stopPropagation(); handleMoveImage(editingProject, idx, idx - 1); }}
                               disabled={idx === 0}
                               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${idx === 0 ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5' : 'bg-[#222] text-white hover:bg-[#333] border border-white/10'}`}
-                              title="Di chuyển sang trái"
+                              title="Sang trái (trong dự án)"
                             >
                               <ArrowLeft size={16} />
                             </button>
@@ -1095,7 +1152,7 @@ export default function AdminView() {
                               onClick={(e) => { e.stopPropagation(); handleMoveImage(editingProject, idx, idx + 1); }}
                               disabled={idx === editingProject.images.length - 1}
                               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${idx === editingProject.images.length - 1 ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5' : 'bg-[#222] text-white hover:bg-[#333] border border-white/10'}`}
-                              title="Di chuyển sang phải"
+                              title="Sang phải (trong dự án)"
                             >
                               <ArrowRight size={16} />
                             </button>
@@ -1103,7 +1160,7 @@ export default function AdminView() {
                         </div>
                         
                         {/* Position badge */}
-                        <div className="absolute top-3 left-3 w-8 h-8 rounded-xl bg-black/60 flex items-center justify-center text-white font-bold text-[10px] border border-white/10">
+                        <div className="absolute top-3 left-3 w-8 h-8 rounded-xl bg-black/60 flex items-center justify-center text-white font-bold text-[10px] border border-white/10 pointer-events-none opacity-0">
                           {idx + 1}
                         </div>
                      </div>
@@ -1125,9 +1182,52 @@ export default function AdminView() {
                     </div>
                  )}
               </div>
-           </div>
-        </div>
+            </div>
+
+            {/* Move Images Modal */}
+            {showMoveModal && (
+              <div 
+                className="absolute inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 rounded-[2rem]"
+                onClick={() => setShowMoveModal(false)}
+              >
+                 <div 
+                   className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl flex flex-col max-h-[80%]"
+                   onClick={(e) => e.stopPropagation()}
+                 >
+                    <div className="flex items-center gap-3 mb-2 text-blue-400">
+                      <FolderHeart size={24} />
+                      <h3 className="text-xl md:text-2xl font-bold text-white">Chuyển ảnh sang dự án khác</h3>
+                    </div>
+                    <p className="text-white/50 mb-6 text-sm">Bạn đang chọn {selectedImageIndexes.length} ảnh. Hãy chọn dự án đích để di chuyển tới:</p>
+                    
+                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 mb-6 pr-2">
+                       {projects.filter(p => p.id !== editingProject.id).map(p => (
+                         <button 
+                           key={p.id} 
+                           onClick={() => handleMoveSelectedImages(p.id)}
+                           className="w-full text-left px-5 py-4 rounded-2xl bg-white/5 hover:bg-blue-500/20 border border-white/5 hover:border-blue-500/50 transition-all group flex flex-col"
+                         >
+                           <span className="text-white font-semibold text-lg group-hover:text-blue-400 transition-colors truncate">{p.title || 'Không tên'}</span>
+                           <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-semibold mt-1">{p.category} • {p.images?.length || 0} ẢNH</span>
+                         </button>
+                       ))}
+                       {projects.filter(p => p.id !== editingProject.id).length === 0 && (
+                         <div className="text-center py-10 bg-white/5 rounded-2xl border border-dashed border-white/10">
+                           <p className="text-white/40 text-sm">Không có dự án nào khác để chuyển đến.</p>
+                         </div>
+                       )}
+                    </div>
+                    
+                    <div className="flex justify-end pt-4 border-t border-white/5">
+                      <button onClick={() => setShowMoveModal(false)} className="px-6 py-3 rounded-xl bg-white/10 text-white/80 font-semibold hover:bg-white/20 hover:text-white transition-colors">Hủy & Quay Lại</button>
+                    </div>
+                 </div>
+              </div>
+            )}
+         </div>
       )}
     </div>
+  );
+}
   );
 }
