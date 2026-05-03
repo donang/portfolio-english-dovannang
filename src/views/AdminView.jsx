@@ -615,9 +615,9 @@ export default function AdminView() {
                          <div className="w-full rounded-3xl overflow-hidden relative bg-[#111] border border-white/5 group-hover/item:border-white/30 transition-all duration-500 shadow-xl group-hover/item:shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
                             <img src={proj.images?.[0] || proj.imageUrl} alt={proj.title} className="w-full object-cover opacity-80 group-hover/item:opacity-100 group-hover/item:scale-105 transition-transform duration-700 ease-out" />
                             
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                              <h3 className="text-base font-bold text-white leading-tight mb-1">{proj.title}</h3>
-                              <span className="text-[10px] uppercase tracking-widest font-bold text-white/60">{proj.category}</span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-4 md:p-5 opacity-100 transition-all duration-300 group-hover/item:from-black">
+                              <h3 className="text-base font-bold text-white leading-tight mb-1 drop-shadow-md">{proj.title}</h3>
+                              <span className="text-[10px] uppercase tracking-widest font-bold text-white/80 drop-shadow-md">{proj.category}</span>
                             </div>
                             
                             {/* Delete Button Corner */}
@@ -1079,14 +1079,14 @@ export default function AdminView() {
                    </div>
                    <p className="text-white/50 text-[10px] md:text-xs uppercase tracking-[0.3em] font-semibold mt-2">{editingProject.category}</p>
                  </div>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-3">
                    {selectedImageIndexes.length > 0 && (
-                     <button onClick={() => setShowMoveModal(true)} className="px-4 h-12 rounded-2xl bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 border border-blue-500/30 font-semibold text-sm transition-all flex items-center gap-2">
-                       <FolderHeart size={18} />
-                       <span className="whitespace-nowrap">Chuyển {selectedImageIndexes.length} ảnh</span>
+                     <button onClick={() => setShowMoveModal(true)} className="px-5 h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.6)] hover:-translate-y-0.5 font-bold text-sm transition-all duration-300 flex items-center gap-2 border border-white/20">
+                       <FolderHeart size={18} className="animate-bounce" />
+                       <span className="whitespace-nowrap uppercase tracking-wider">Chuyển {selectedImageIndexes.length} Ảnh</span>
                      </button>
                    )}
-                   <button onClick={() => { setEditingProject(null); setSelectedImageIndexes([]); setShowMoveModal(false); }} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white">
+                   <button onClick={() => { setEditingProject(null); setSelectedImageIndexes([]); setShowMoveModal(false); }} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white hover:scale-105">
                      <span className="font-bold text-xl pointer-events-none">X</span>
                    </button>
                  </div>
@@ -1114,17 +1114,16 @@ export default function AdminView() {
                   </div>
 
                   {editingProject.images?.map((imgStr, idx) => (
-                     <div key={idx} className="relative group/editcard rounded-2xl overflow-hidden h-48 md:h-56 lg:h-64 border border-white/5 hover:border-white/20 transition-all bg-[#1a1a1a] flex items-center justify-center">
-                        <img src={imgStr} className="w-full h-full object-contain p-2" />
+                     <div key={idx} className={`relative group/editcard rounded-3xl overflow-hidden h-48 md:h-56 lg:h-64 border transition-all duration-500 flex items-center justify-center ${selectedImageIndexes.includes(idx) ? 'bg-[#0a1526] border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.3)] ring-2 ring-blue-500/50 scale-[0.97]' : 'bg-[#1a1a1a] border-white/5 hover:border-white/20'}`}>
+                        <img src={imgStr} className={`w-full h-full object-contain p-2 transition-all duration-500 ${selectedImageIndexes.includes(idx) ? 'scale-90 opacity-80' : 'group-hover/editcard:scale-105'}`} />
                         
-                        {/* Checkbox Always Visible for Selection */}
+                        {/* Beautiful Checkbox UI */}
                         <div 
                           onClick={(e) => { e.stopPropagation(); handleToggleSelectImage(idx); }}
-                          className={`absolute top-3 left-3 px-3 py-1.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all border z-20 shadow-lg ${selectedImageIndexes.includes(idx) ? 'bg-blue-500 border-blue-400 text-white scale-105' : 'bg-black/80 border-white/30 text-white/60 hover:border-white/80 hover:text-white backdrop-blur-md'}`}
+                          className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 z-20 ${selectedImageIndexes.includes(idx) ? 'bg-gradient-to-tr from-blue-600 to-cyan-400 shadow-[0_0_20px_rgba(56,189,248,0.6)] scale-110 border border-white/30' : 'bg-black/30 border-2 border-white/20 hover:bg-black/60 hover:border-white/50 hover:scale-105 backdrop-blur-md'}`}
                           title="Chọn để di chuyển"
                         >
-                          <CheckCircle2 size={16} />
-                          <span className="text-[10px] uppercase tracking-widest font-bold">{selectedImageIndexes.includes(idx) ? 'Đã Chọn' : 'Chọn'}</span>
+                          <CheckCircle2 size={20} strokeWidth={selectedImageIndexes.includes(idx) ? 2.5 : 2} className={selectedImageIndexes.includes(idx) ? 'text-white' : 'text-transparent'} />
                         </div>
 
                         {/* Overlay with controls */}
