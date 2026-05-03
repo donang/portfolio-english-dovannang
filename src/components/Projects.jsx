@@ -59,7 +59,7 @@ export default function Projects({ limit }) {
   }, [selectedLightboxProject, currentImageIndex]);
 
   useEffect(() => {
-    const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'projects'), orderBy('createdAt', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const projs = [];
       snapshot.forEach((doc) => {

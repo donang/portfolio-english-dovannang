@@ -207,13 +207,22 @@ export default function AdminView() {
     setProgress(5);
 
     try {
-        const uploadedUrls = [];
-        for (let i = 0; i < files.length; i++) {
-            // Upload file gốc trực tiếp, chỉ nén nếu file > 10MB
-            const fileToUpload = files[i].size > 10 * 1024 * 1024 ? await compressImage(files[i]) : files[i];
-            const url = await uploadToImgBB(fileToUpload);
-            uploadedUrls.push(url);
-            setProgress(5 + Math.round(((i + 1) / files.length) * 80));
+        let uploadedUrls = [];
+        const BATCH_SIZE = 3; // Tải song song 3 ảnh cùng lúc
+        
+        for (let i = 0; i < files.length; i += BATCH_SIZE) {
+            const batchFiles = files.slice(i, i + BATCH_SIZE);
+            const batchPromises = batchFiles.map(async (file) => {
+                const fileToUpload = file.size > 10 * 1024 * 1024 ? await compressImage(file) : file;
+                return await uploadToImgBB(fileToUpload);
+            });
+            
+            const batchUrls = await Promise.all(batchPromises);
+            uploadedUrls = uploadedUrls.concat(batchUrls);
+            
+            // Cập nhật thanh tiến trình
+            const currentCount = Math.min(i + BATCH_SIZE, files.length);
+            setProgress(5 + Math.round((currentCount / files.length) * 80));
         }
 
         setProgress(90);
