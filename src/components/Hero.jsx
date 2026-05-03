@@ -82,7 +82,7 @@ export default function Hero() {
 
         <div className="flex flex-col items-center lg:items-start w-full">
           <p className="text-[13px] md:text-[14px] xl:text-[16px] text-transparent bg-clip-text bg-gradient-to-r from-[#e2e8f0] to-[#b8c2d1] font-medium tracking-[0.02em] flex items-center justify-center lg:justify-start gap-2 relative z-20 mb-4 md:mb-5 lg:mb-6">
-            Xin chào! Mình là <span className="animate-waving-hand inline-block origin-bottom-right drop-shadow-md">👋</span>
+            Xin chào <span className="animate-waving-hand inline-block origin-bottom-right drop-shadow-md">👋</span>! Mình là
           </p>
 
           <h1 className="text-[2rem] min-[380px]:text-[2.3rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[5.2rem] xl:text-[5.8rem] font-extrabold tracking-tight whitespace-nowrap z-10 flex flex-row items-center justify-center lg:justify-start" style={{ lineHeight: '1.1' }}>

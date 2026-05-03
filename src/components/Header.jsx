@@ -66,7 +66,7 @@ const Header = () => {
           {/* AI Generated Pure Logo N */}
           <div className="flex items-center justify-center shrink-0 pr-1 group cursor-pointer">
             <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[10px] md:rounded-xl overflow-hidden shadow-[0_2px_15px_rgba(255,42,133,0.3)] group-hover:shadow-[0_4px_20px_rgba(255,42,133,0.6)] group-hover:scale-105 transition-all duration-300 border border-white/10 flex items-center justify-center">
-              <img src="/logo_n.png" alt="Đỗ Văn Năng Logo" className="w-full h-full object-cover scale-[1.15]" />
+              <img src={`${import.meta.env.BASE_URL}logo_n.png`} alt="Đỗ Văn Năng Logo" className="w-full h-full object-cover scale-[1.15]" />
             </div>
           </div>
           

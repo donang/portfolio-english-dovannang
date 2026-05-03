@@ -1,11 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Lock, AlertCircle, CheckCircle2, Image as ImageIcon, Trash2, LayoutDashboard, Settings as SettingsIcon, LogOut, BarChart3, FolderHeart, ImageIcon as MImageIcon, ChevronDown, ChevronLeft, ChevronRight, User, PlusCircle, Save, Briefcase, Calendar, MessageCircle, ArrowLeft, ArrowRight, Star } from 'lucide-react';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, updateDoc, where, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { db, auth } from '../firebase';
 
 export default function AdminView() {
+  useEffect(() => {
+    document.title = 'Sửa CV';
+    const link = document.querySelector("link[rel~='icon']");
+    const oldHref = link?.href;
+    if (link) link.href = import.meta.env.BASE_URL + 'favicon-admin.svg?v=2';
+    return () => {
+      document.title = 'Portfolio Đỗ Văn Năng';
+      if (link) link.href = import.meta.env.BASE_URL + 'favicon-cv.svg?v=2';
+    };
+  }, []);
   const [pin, setPin] = useState('');
+  const [username, setUsername] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Firebase Auth: tự động kiểm tra session đăng nhập
+  useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setAuthLoading(false);
+    });
+    return () => unsubAuth();
+  }, []);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -81,16 +103,43 @@ export default function AdminView() {
     return () => { unsubProjects(); unsubProfile(); };
   }, [isAuthenticated]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (pin === '123456') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Mã PIN không chính xác!');
+    setError('');
+    try {
+      await signInWithEmailAndPassword(auth, username, pin);
+      // onAuthStateChanged sẽ tự set isAuthenticated = true
+    } catch (err) {
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('Tài khoản hoặc mật khẩu không chính xác!');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Email không hợp lệ!');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Quá nhiều lần thử. Vui lòng đợi vài phút!');
+      } else {
+        setError('Lỗi đăng nhập: ' + err.message);
+      }
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  // Upload ảnh GỐC lên ImgBB (không nén qua canvas để giữ chất lượng 100%)
+  const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
+
+  const uploadToImgBB = async (file) => {
+      const formData = new FormData();
+      formData.append('key', IMGBB_API_KEY);
+      formData.append('image', file);
+      const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error?.message || 'ImgBB upload failed');
+      return json.data.url || json.data.display_url;
+  };
+
+  // Giữ lại hàm compressImage cho trường hợp cần (file quá lớn > 10MB)
   const compressImage = (file) => new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -99,40 +148,18 @@ export default function AdminView() {
           img.src = event.target.result;
           img.onload = () => {
               const canvas = document.createElement('canvas');
-              const MAX_WIDTH = 2400;
-              const MAX_HEIGHT = 2400;
-              let width = img.width;
-              let height = img.height;
-
-              if (width > height) {
-                  if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-              } else {
-                  if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-              }
-              
-              canvas.width = width;
-              canvas.height = height;
+              canvas.width = img.width;
+              canvas.height = img.height;
               const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL('image/jpeg', 0.85));
+              ctx.drawImage(img, 0, 0);
+              canvas.toBlob((blob) => {
+                  resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+              }, 'image/jpeg', 0.92);
           };
           img.onerror = () => reject('Không thể đọc file ảnh');
       };
       reader.onerror = () => reject('Lỗi đọc file từ đĩa');
   });
-
-  // Upload ảnh lên ImgBB và trả về URL
-  const IMGBB_API_KEY = 'cfc5659b89da170f89152378a7077887';
-  const uploadToImgBB = async (base64DataUrl) => {
-      const base64Data = base64DataUrl.split(',')[1];
-      const formData = new FormData();
-      formData.append('key', IMGBB_API_KEY);
-      formData.append('image', base64Data);
-      const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error?.message || 'ImgBB upload failed');
-      return json.data.display_url;
-  };
 
   const handleAddImagesToProject = async (e, project) => {
       const files = Array.from(e.target.files);
@@ -142,18 +169,13 @@ export default function AdminView() {
       setProgress(5);
   
       try {
-          const compressedBase64Array = [];
-          for (let i = 0; i < files.length; i++) {
-              const base64 = await compressImage(files[i]);
-              compressedBase64Array.push(base64);
-              setProgress(5 + Math.round(((i + 1) / files.length) * 30));
-          }
-  
           const uploadedUrls = [];
-          for (let i = 0; i < compressedBase64Array.length; i++) {
-              const url = await uploadToImgBB(compressedBase64Array[i]);
+          for (let i = 0; i < files.length; i++) {
+              // Upload file gốc trực tiếp, chỉ nén nếu file > 10MB
+              const fileToUpload = files[i].size > 10 * 1024 * 1024 ? await compressImage(files[i]) : files[i];
+              const url = await uploadToImgBB(fileToUpload);
               uploadedUrls.push(url);
-              setProgress(35 + Math.round(((i + 1) / compressedBase64Array.length) * 55));
+              setProgress(5 + Math.round(((i + 1) / files.length) * 85));
           }
   
           let oldImages = [];
@@ -185,20 +207,13 @@ export default function AdminView() {
     setProgress(5);
 
     try {
-        const compressedBase64Array = [];
-        for (let i = 0; i < files.length; i++) {
-            const base64 = await compressImage(files[i]);
-            compressedBase64Array.push(base64);
-            setProgress(5 + Math.round(((i + 1) / files.length) * 30));
-        }
-
-        setProgress(35);
-
         const uploadedUrls = [];
-        for (let i = 0; i < compressedBase64Array.length; i++) {
-            const url = await uploadToImgBB(compressedBase64Array[i]);
+        for (let i = 0; i < files.length; i++) {
+            // Upload file gốc trực tiếp, chỉ nén nếu file > 10MB
+            const fileToUpload = files[i].size > 10 * 1024 * 1024 ? await compressImage(files[i]) : files[i];
+            const url = await uploadToImgBB(fileToUpload);
             uploadedUrls.push(url);
-            setProgress(35 + Math.round(((i + 1) / compressedBase64Array.length) * 50));
+            setProgress(5 + Math.round(((i + 1) / files.length) * 80));
         }
 
         setProgress(90);
@@ -286,6 +301,14 @@ export default function AdminView() {
   const filterCategoriesMenu = ['All', ...new Set(projects.map(p => p.category))];
   const filteredProjects = activeFilter === 'All' ? projects : projects.filter(p => p.category === activeFilter);
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4 relative font-sans">
@@ -298,19 +321,32 @@ export default function AdminView() {
                 <Lock className="text-white/80" size={24} />
               </div>
               <div className="text-center">
-                <h1 className="text-2xl font-semibold tracking-tight text-white">Admin Access</h1>
-                <p className="text-white/40 text-sm mt-1">Vui lòng nhập mã PIN để tiếp tục</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-white uppercase">PORTFOLIO ĐỖ VĂN NĂNG</h1>
+                <p className="text-white/40 text-sm mt-1">Vui lòng đăng nhập để tiếp tục</p>
               </div>
             </div>
 
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] text-white/50 uppercase tracking-widest font-semibold pl-1">Email</label>
+                <input
+                  type="email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Nhập email"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 outline-none focus:border-white/30 text-sm font-medium text-white transition-all focus:bg-black/80"
+                  autoComplete="email"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] text-white/50 uppercase tracking-widest font-semibold pl-1">Mật khẩu</label>
                 <input
                   type="password"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
-                  placeholder="Mã PIN"
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 outline-none focus:border-white/30 text-center text-lg tracking-[0.5em] font-medium text-white transition-all focus:bg-black/80"
+                  placeholder="Nhập mật khẩu"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 outline-none focus:border-white/30 text-sm font-medium text-white transition-all focus:bg-black/80"
+                  autoComplete="current-password"
                 />
               </div>
               
@@ -367,7 +403,7 @@ export default function AdminView() {
            </button>
         </div>
         
-        <button onClick={() => setIsAuthenticated(false)} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-2 transition-colors px-2 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
+        <button onClick={handleLogout} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-2 transition-colors px-2 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
           <span className="hidden sm:inline">Đăng Xuất</span> <LogOut size={16} className="shrink-0" />
         </button>
       </nav>

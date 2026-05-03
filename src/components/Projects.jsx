@@ -23,6 +23,30 @@ export default function Projects({ limit }) {
   const [showAllOverlay, setShowAllOverlay] = useState(false);
   const [slideDirection, setSlideDirection] = useState('none'); // 'left' | 'right' | 'none'
 
+  // Swipe gesture state for mobile lightbox
+  const touchStartX = React.useRef(0);
+  const touchEndX = React.useRef(0);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].screenX;
+    const diff = touchStartX.current - touchEndX.current;
+    const SWIPE_THRESHOLD = 50;
+    if (!selectedLightboxProject?.images?.length) return;
+    if (diff > SWIPE_THRESHOLD) {
+      // Vuốt sang trái → ảnh tiếp theo
+      setSlideDirection('right');
+      setCurrentImageIndex(prev => prev === selectedLightboxProject.images.length - 1 ? 0 : prev + 1);
+    } else if (diff < -SWIPE_THRESHOLD) {
+      // Vuốt sang phải → ảnh trước
+      setSlideDirection('left');
+      setCurrentImageIndex(prev => prev === 0 ? selectedLightboxProject.images.length - 1 : prev - 1);
+    }
+  };
+
   // Preload adjacent images for instant navigation
   useEffect(() => {
     if (!selectedLightboxProject?.images?.length) return;
@@ -127,13 +151,9 @@ export default function Projects({ limit }) {
           from { opacity: 0; transform: scale(0.95) translateY(20px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes slideFromRight {
-          from { opacity: 0; transform: translate3d(60px, 0, 0) scale(0.97); }
-          to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-        }
-        @keyframes slideFromLeft {
-          from { opacity: 0; transform: translate3d(-60px, 0, 0) scale(0.97); }
-          to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        @keyframes smoothFadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
         }
         .gallery-item {
           opacity: 0;
@@ -142,17 +162,10 @@ export default function Projects({ limit }) {
         .modal-frame {
           animation: modalScaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .slide-right {
-          animation: slideFromRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity;
-        }
-        .slide-left {
-          animation: slideFromLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity;
-        }
+        .slide-right,
+        .slide-left,
         .slide-none {
-          animation: slideFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity;
+          animation: smoothFadeIn 0.4s ease-out forwards;
         }
       `}</style>
 
@@ -224,7 +237,7 @@ export default function Projects({ limit }) {
               <button
                 autoFocus
                 aria-label="Previous Image"
-                className="absolute left-4 md:left-12 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
+                className="absolute left-4 md:left-12 w-12 h-12 md:w-14 md:h-14 hidden md:flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
                 onClick={(e) => { e.stopPropagation(); setSlideDirection('left'); setCurrentImageIndex(prev => prev === 0 ? selectedLightboxProject.images.length - 1 : prev - 1) }}
               >
                 <ChevronLeft size={28} />
@@ -236,30 +249,17 @@ export default function Projects({ limit }) {
               src={selectedLightboxProject.images?.[currentImageIndex] || selectedLightboxProject.imageUrl || selectedLightboxProject.image}
               alt="Fullscreen Preview"
               loading="eager"
-              className={`max-w-[90vw] max-h-[85vh] object-contain rounded-2xl shadow-3d pointer-events-auto cursor-default slide-${slideDirection}`}
-              onLoad={(e) => {
-                const img = e.target;
-                const vw = window.innerWidth * 0.9;
-                const vh = window.innerHeight * 0.85;
-                const imgRatio = img.naturalWidth / img.naturalHeight;
-                const viewRatio = vw / vh;
-                
-                // If image is wider relative to viewport, limit by width. Otherwise limit by height.
-                if (imgRatio > viewRatio) {
-                  img.style.width = '90vw';
-                  img.style.height = 'auto';
-                } else {
-                  img.style.height = '85vh';
-                  img.style.width = 'auto';
-                }
-              }}
+              className={`max-w-[90vw] max-h-[85vh] w-auto h-auto object-contain rounded-2xl shadow-3d pointer-events-auto cursor-default slide-${slideDirection} select-none`}
               onClick={(e) => e.stopPropagation()}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              draggable={false}
             />
 
             {selectedLightboxProject.images?.length > 1 && (
               <button
                 aria-label="Next Image"
-                className="absolute right-4 md:right-12 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
+                className="absolute right-4 md:right-12 w-12 h-12 md:w-14 md:h-14 hidden md:flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] ring-1 ring-inset ring-white/10 hover:bg-black/80 hover:ring-white/20 text-white pointer-events-auto hover:scale-110 z-50 transition-all"
                 onClick={(e) => { e.stopPropagation(); setSlideDirection('right'); setCurrentImageIndex(prev => prev === selectedLightboxProject.images.length - 1 ? 0 : prev + 1) }}
               >
                 <ChevronRight size={28} />

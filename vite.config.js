@@ -37,7 +37,7 @@ try {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/cv-Do-Van-Nang/',
   server: {
     fs: {
       strict: false,
