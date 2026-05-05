@@ -27,7 +27,6 @@ const Header = () => {
           const element = doc.querySelector('.page');
           
           if (!element) {
-          if (!element) {
               const htmlContent = doc.body.innerHTML.substring(0, 100);
               alert("Lỗi: Không tìm thấy nội dung CV. Có thể sai đường dẫn. Nội dung nhận được: " + htmlContent);
               setIsDownloading(false);
