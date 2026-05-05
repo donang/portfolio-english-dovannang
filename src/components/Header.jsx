@@ -5,61 +5,96 @@ const Header = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownloadCV = (e) => {
+  const handleDownloadCV = async (e) => {
     e.preventDefault();
     if (isDownloading) return;
     setIsDownloading(true);
 
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.top = '-9999px';
-    iframe.style.width = '814px'; 
-    iframe.style.height = '1150px';
-    iframe.src = `${import.meta.env.BASE_URL}cv/index.html`;
-
-    iframe.onload = () => {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const script = doc.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        
-        script.onload = () => {
-          const element = doc.querySelector('.page');
-          
-          if (!element) {
-              const htmlContent = doc.body.innerHTML.substring(0, 100);
-              alert("Lỗi: Không tìm thấy nội dung CV. Có thể sai đường dẫn. Nội dung nhận được: " + htmlContent);
-              setIsDownloading(false);
-              document.body.removeChild(iframe);
-              return;
-          }
-
-          const opt = {
-            margin: 0,
-            filename: 'CV_Do_Van_Nang.pdf',
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 3, useCORS: true, letterRendering: true },
-            jsPDF: { unit: 'px', format: [814, 1150], orientation: 'portrait' }
-          };
-
-          iframe.contentWindow.html2pdf().set(opt).from(element).save().then(() => {
-            setIsDownloading(false);
-            document.body.removeChild(iframe);
-          }).catch(err => {
-            alert("Lỗi xuất PDF: " + err.message);
-            setIsDownloading(false);
-            document.body.removeChild(iframe);
-          });
-        };
-        doc.head.appendChild(script);
-      } catch (err) {
-        alert("Lỗi iframe: " + err.message);
-        setIsDownloading(false);
-        document.body.removeChild(iframe);
+    try {
+      // 1. Load thư viện html2pdf.js nếu chưa có
+      if (!window.html2pdf) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Không tải được thư viện html2pdf'));
+          document.head.appendChild(script);
+        });
       }
-    };
-    
-    document.body.appendChild(iframe);
+
+      // 2. Tải file HTML và CSS của CV
+      const baseUrl = import.meta.env.BASE_URL;
+      const [htmlRes, cssRes] = await Promise.all([
+        fetch(`${baseUrl}cv/index.html`),
+        fetch(`${baseUrl}cv/style.css`)
+      ]);
+
+      if (!htmlRes.ok) {
+        alert('Không tìm thấy file CV (lỗi ' + htmlRes.status + '). Kiểm tra lại thư mục public/cv/');
+        setIsDownloading(false);
+        return;
+      }
+
+      const htmlText = await htmlRes.text();
+      const cssText = await cssRes.text();
+
+      // 3. Parse HTML để lấy nội dung .page
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, 'text/html');
+      const page = doc.querySelector('.page');
+
+      if (!page) {
+        alert('Không tìm thấy phần tử .page trong file CV');
+        setIsDownloading(false);
+        return;
+      }
+
+      // 4. Sửa đường dẫn ảnh cho đúng
+      page.querySelectorAll('img').forEach(img => {
+        const src = img.getAttribute('src');
+        if (src && !src.startsWith('http')) {
+          img.src = `${baseUrl}cv/${src}`;
+        }
+      });
+
+      // 5. Tạo container ẩn chứa CSS + nội dung CV
+      const container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.top = '-9999px';
+      container.style.left = '0';
+      container.style.width = '814px';
+
+      const styleEl = document.createElement('style');
+      styleEl.textContent = cssText;
+      container.appendChild(styleEl);
+
+      const fontLink = document.createElement('link');
+      fontLink.rel = 'stylesheet';
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Qwitcher+Grypen:wght@400;700&family=Dancing+Script:wght@400;500;600;700&display=swap';
+      container.appendChild(fontLink);
+
+      container.appendChild(page);
+      document.body.appendChild(container);
+
+      // 6. Chờ font và ảnh load xong
+      await new Promise(r => setTimeout(r, 2000));
+
+      // 7. Xuất PDF
+      const opt = {
+        margin: 0,
+        filename: 'CV_Do_Van_Nang.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'px', format: [814, 1150], orientation: 'portrait' }
+      };
+
+      await window.html2pdf().set(opt).from(page).save();
+      document.body.removeChild(container);
+      setIsDownloading(false);
+    } catch (err) {
+      alert('Lỗi tải CV: ' + err.message);
+      setIsDownloading(false);
+    }
   };
 
   useEffect(() => {
