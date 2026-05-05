@@ -7,7 +7,10 @@ const Header = () => {
 
   const handleDownloadCV = (e) => {
     e.preventDefault();
-    window.open('https://donang.github.io/cv-do-van-nang/', '_blank');
+    const link = document.createElement('a');
+    link.href = `${import.meta.env.BASE_URL}CV_Do_Van_Nang.pdf`;
+    link.download = 'CV_Do_Van_Nang.pdf';
+    link.click();
   };
 
   useEffect(() => {
