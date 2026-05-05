@@ -66,7 +66,7 @@ const Header = () => {
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{margin:0;padding:0;background:#0c0c1d;}
 ${cssText}
-.page{width:210mm;min-height:297mm;height:auto;margin:0;overflow:visible;}
+.page{width:210mm;height:297mm;max-height:297mm;margin:0;overflow:hidden;}
 </style>
 </head><body>${page.outerHTML}</body></html>`);
       iframeDoc.close();
