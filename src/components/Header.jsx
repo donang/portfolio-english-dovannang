@@ -85,7 +85,7 @@ const Header = () => {
         filename: 'CV_Do_Van_Nang.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 3, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'px', format: [814, 1150], orientation: 'portrait' }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       await window.html2pdf().set(opt).from(page).save();
