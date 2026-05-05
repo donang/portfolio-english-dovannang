@@ -1,8 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 
 const Header = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadCV = (e) => {
+    e.preventDefault();
+    if (isDownloading) return;
+    setIsDownloading(true);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-9999px';
+    iframe.style.width = '814px'; 
+    iframe.style.height = '1150px';
+    iframe.src = `${import.meta.env.BASE_URL}cv/index.html`;
+
+    iframe.onload = () => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        const script = doc.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        
+        script.onload = () => {
+          const element = doc.querySelector('.page');
+          
+          if (!element) {
+              console.error("Không tìm thấy .page trong CV");
+              setIsDownloading(false);
+              document.body.removeChild(iframe);
+              return;
+          }
+
+          const opt = {
+            margin: 0,
+            filename: 'CV_Do_Van_Nang.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+            jsPDF: { unit: 'px', format: [814, 1150], orientation: 'portrait' }
+          };
+
+          iframe.contentWindow.html2pdf().set(opt).from(element).save().then(() => {
+            setIsDownloading(false);
+            document.body.removeChild(iframe);
+          }).catch(err => {
+            console.error("Lỗi xuất PDF:", err);
+            setIsDownloading(false);
+            document.body.removeChild(iframe);
+          });
+        };
+        doc.head.appendChild(script);
+      } catch (err) {
+        console.error("Lỗi iframe:", err);
+        setIsDownloading(false);
+        document.body.removeChild(iframe);
+      }
+    };
+    
+    document.body.appendChild(iframe);
+  };
 
   useEffect(() => {
     const sections = ['home', 'projects', 'skills', 'about', 'contact'];
@@ -114,8 +171,13 @@ const Header = () => {
       </nav>
 
       <div className="hidden md:flex justify-end w-auto min-w-[200px]">
-        <button className="flex items-center text-white rounded-xl text-[11px] font-semibold px-6 py-2.5 transition-all shadow-[0_0_20px_rgba(112,0,255,0.15)] border border-purple-500/50 hover:bg-white/5">
-          TẢI CV <Download size={14} className="ml-2 opacity-80" />
+        <button 
+          onClick={handleDownloadCV}
+          disabled={isDownloading}
+          className={`flex items-center text-white rounded-xl text-[11px] font-semibold px-6 py-2.5 transition-all shadow-[0_0_20px_rgba(112,0,255,0.15)] border border-purple-500/50 ${isDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
+        >
+          {isDownloading ? 'ĐANG XUẤT PDF...' : 'TẢI CV'} 
+          {isDownloading ? <Loader2 size={14} className="ml-2 opacity-80 animate-spin" /> : <Download size={14} className="ml-2 opacity-80" />}
         </button>
       </div>
       </div>
