@@ -11,18 +11,7 @@ const Header = () => {
     setIsDownloading(true);
 
     try {
-      // 1. Load thư viện html2pdf.js nếu chưa có
-      if (!window.html2pdf) {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-          script.onload = resolve;
-          script.onerror = () => reject(new Error('Không tải được thư viện html2pdf'));
-          document.head.appendChild(script);
-        });
-      }
-
-      // 2. Tải file HTML và CSS của CV
+      // 1. Tải file HTML và CSS của CV
       const baseUrl = import.meta.env.BASE_URL;
       const [htmlRes, cssRes] = await Promise.all([
         fetch(`${baseUrl}cv/index.html`),
@@ -30,7 +19,7 @@ const Header = () => {
       ]);
 
       if (!htmlRes.ok) {
-        alert('Không tìm thấy file CV (lỗi ' + htmlRes.status + '). Kiểm tra lại thư mục public/cv/');
+        alert('Không tìm thấy file CV (lỗi ' + htmlRes.status + ')');
         setIsDownloading(false);
         return;
       }
@@ -38,7 +27,7 @@ const Header = () => {
       const htmlText = await htmlRes.text();
       const cssText = await cssRes.text();
 
-      // 3. Parse HTML để lấy nội dung .page
+      // 2. Parse HTML để lấy nội dung .page
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, 'text/html');
       const page = doc.querySelector('.page');
@@ -49,47 +38,63 @@ const Header = () => {
         return;
       }
 
-      // 4. Sửa đường dẫn ảnh cho đúng
+      // 3. Sửa đường dẫn ảnh cho đúng
       page.querySelectorAll('img').forEach(img => {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('http')) {
-          img.src = `${baseUrl}cv/${src}`;
+          img.src = `${window.location.origin}${baseUrl}cv/${src}`;
         }
       });
 
-      // 5. Tạo container ẩn chứa CSS + nội dung CV
-      const container = document.createElement('div');
-      container.style.position = 'fixed';
-      container.style.top = '-9999px';
-      container.style.left = '0';
-      container.style.width = '814px';
+      // 4. Tạo iframe hoàn toàn tách biệt CSS
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-9999px';
+      iframe.style.left = '0';
+      iframe.style.width = '794px';
+      iframe.style.height = '1123px';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
 
-      const styleEl = document.createElement('style');
-      styleEl.textContent = cssText;
-      container.appendChild(styleEl);
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Qwitcher+Grypen:wght@400;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{margin:0;padding:0;background:#0c0c1d;}
+${cssText}
+.page{width:210mm;min-height:297mm;height:auto;margin:0;overflow:visible;}
+</style>
+</head><body>${page.outerHTML}</body></html>`);
+      iframeDoc.close();
 
-      const fontLink = document.createElement('link');
-      fontLink.rel = 'stylesheet';
-      fontLink.href = 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Qwitcher+Grypen:wght@400;700&family=Dancing+Script:wght@400;500;600;700&display=swap';
-      container.appendChild(fontLink);
+      // 5. Chờ font và ảnh load xong
+      await new Promise(r => setTimeout(r, 3000));
 
-      container.appendChild(page);
-      document.body.appendChild(container);
+      // 6. Load html2pdf vào iframe
+      await new Promise((resolve, reject) => {
+        const script = iframeDoc.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Không tải được thư viện html2pdf'));
+        iframeDoc.head.appendChild(script);
+      });
 
-      // 6. Chờ font và ảnh load xong
-      await new Promise(r => setTimeout(r, 2000));
-
-      // 7. Xuất PDF
+      // 7. Xuất PDF chuẩn A4
+      const pageEl = iframeDoc.querySelector('.page');
       const opt = {
         margin: 0,
         filename: 'CV_Do_Van_Nang.pdf',
         image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+        html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollY: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      await window.html2pdf().set(opt).from(page).save();
-      document.body.removeChild(container);
+      await iframe.contentWindow.html2pdf().set(opt).from(pageEl).save();
+      document.body.removeChild(iframe);
       setIsDownloading(false);
     } catch (err) {
       alert('Lỗi tải CV: ' + err.message);
