@@ -65,7 +65,10 @@ export default function AdminView() {
   });
   const [savingProfile, setSavingProfile] = useState(false);
 
-  const showAlert = (title, message) => setModal({ isOpen: true, title, message, type: 'alert', onConfirm: null });
+  const showAlert = (title, message) => {
+    const isSuccess = /thành công/i.test(title);
+    setModal({ isOpen: true, title, message, type: isSuccess ? 'success' : 'alert', onConfirm: null });
+  };
   const showConfirm = (title, message, onConfirm) => setModal({ isOpen: true, title, message, type: 'confirm', onConfirm });
 
   const defaultFaqs = [
@@ -1054,16 +1057,23 @@ export default function AdminView() {
       {/* Custom Global Modal */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-           <div className="bg-[#111] border border-white/5 p-8 rounded-[2rem] shadow-2xl max-w-sm w-full animate-[zoom-in_0.2s_ease-out_forwards] relative overflow-hidden">
-              <div className="flex items-center gap-4 mb-4">
-                 <div className={`w-12 h-12 rounded-full flex items-center justify-center border ${modal.type === 'confirm' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
-                   <AlertCircle size={24} />
+           <div className={`bg-[#111] border p-8 rounded-[2rem] shadow-2xl max-w-sm w-full animate-[zoom-in_0.2s_ease-out_forwards] relative overflow-hidden ${modal.type === 'success' ? 'border-green-500/20' : 'border-white/5'}`}>
+              {/* Glow effect for success */}
+              {modal.type === 'success' && <div className="absolute -top-20 -right-20 w-40 h-40 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />}
+              
+              <div className="flex items-center gap-4 mb-4 relative z-10">
+                 <div className={`w-12 h-12 rounded-full flex items-center justify-center border shrink-0 ${
+                   modal.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]' :
+                   modal.type === 'confirm' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 
+                   'bg-red-500/10 border-red-500/20 text-red-500'
+                 }`}>
+                   {modal.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
                  </div>
                  <h3 className="text-xl font-bold tracking-tight">{modal.title}</h3>
               </div>
-              <p className="text-white/70 mb-8 text-sm leading-relaxed font-medium">{modal.message}</p>
+              <p className="text-white/70 mb-8 text-sm leading-relaxed font-medium relative z-10">{modal.message}</p>
               
-              <div className="flex justify-end gap-3 font-bold">
+              <div className="flex justify-end gap-3 font-bold relative z-10">
                  {modal.type === 'confirm' && (
                    <button onClick={() => setModal({ ...modal, isOpen: false })} className="px-6 py-3 rounded-xl bg-[#1a1a1a] hover:bg-white/10 transition-colors border border-white/5 uppercase tracking-widest text-xs">
                      Hủy
@@ -1075,9 +1085,13 @@ export default function AdminView() {
                      setModal({ ...modal, isOpen: false });
                      if (cb) cb();
                    }} 
-                   className={`px-6 py-3 rounded-xl text-white uppercase tracking-widest text-xs transition-all hover:scale-[1.03] ${modal.type === 'confirm' ? 'bg-red-600 hover:bg-red-500' : 'bg-white text-black hover:bg-white/90'}`}
+                   className={`px-6 py-3 rounded-xl uppercase tracking-widest text-xs transition-all hover:scale-[1.03] ${
+                     modal.type === 'success' ? 'bg-green-500 text-white hover:bg-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]' :
+                     modal.type === 'confirm' ? 'bg-red-600 hover:bg-red-500 text-white' : 
+                     'bg-white text-black hover:bg-white/90'
+                   }`}
                  >
-                   {modal.type === 'confirm' ? 'XÁC NHẬN' : 'Đã Rõ'}
+                   {modal.type === 'confirm' ? 'XÁC NHẬN' : modal.type === 'success' ? 'Tuyệt Vời!' : 'Đã Rõ'}
                  </button>
               </div>
            </div>
