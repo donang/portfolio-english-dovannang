@@ -65,9 +65,20 @@ export default function AdminView() {
   });
   const [savingProfile, setSavingProfile] = useState(false);
 
+  // Toast notification for success messages
+  const [toast, setToast] = useState({ show: false, title: '', message: '' });
+  const toastTimerRef = useRef(null);
+
   const showAlert = (title, message) => {
     const isSuccess = /thành công/i.test(title);
-    setModal({ isOpen: true, title, message, type: isSuccess ? 'success' : 'alert', onConfirm: null });
+    if (isSuccess) {
+      // Show toast instead of modal for success
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      setToast({ show: true, title, message });
+      toastTimerRef.current = setTimeout(() => setToast({ show: false, title: '', message: '' }), 3500);
+    } else {
+      setModal({ isOpen: true, title, message, type: 'alert', onConfirm: null });
+    }
   };
   const showConfirm = (title, message, onConfirm) => setModal({ isOpen: true, title, message, type: 'confirm', onConfirm });
 
@@ -1054,26 +1065,22 @@ export default function AdminView() {
         </div>
       </div>
 
-      {/* Custom Global Modal */}
+      {/* Custom Global Modal (for errors & confirms only) */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-           <div className={`bg-[#111] border p-8 rounded-[2rem] shadow-2xl max-w-sm w-full animate-[zoom-in_0.2s_ease-out_forwards] relative overflow-hidden ${modal.type === 'success' ? 'border-green-500/20' : 'border-white/5'}`}>
-              {/* Glow effect for success */}
-              {modal.type === 'success' && <div className="absolute -top-20 -right-20 w-40 h-40 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />}
-              
-              <div className="flex items-center gap-4 mb-4 relative z-10">
+           <div className="bg-[#111] border border-white/5 p-8 rounded-[2rem] shadow-2xl max-w-sm w-full animate-[zoom-in_0.2s_ease-out_forwards] relative overflow-hidden">
+              <div className="flex items-center gap-4 mb-4">
                  <div className={`w-12 h-12 rounded-full flex items-center justify-center border shrink-0 ${
-                   modal.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]' :
                    modal.type === 'confirm' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 
                    'bg-red-500/10 border-red-500/20 text-red-500'
                  }`}>
-                   {modal.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+                   <AlertCircle size={24} />
                  </div>
                  <h3 className="text-xl font-bold tracking-tight">{modal.title}</h3>
               </div>
-              <p className="text-white/70 mb-8 text-sm leading-relaxed font-medium relative z-10">{modal.message}</p>
+              <p className="text-white/70 mb-8 text-sm leading-relaxed font-medium">{modal.message}</p>
               
-              <div className="flex justify-end gap-3 font-bold relative z-10">
+              <div className="flex justify-end gap-3 font-bold">
                  {modal.type === 'confirm' && (
                    <button onClick={() => setModal({ ...modal, isOpen: false })} className="px-6 py-3 rounded-xl bg-[#1a1a1a] hover:bg-white/10 transition-colors border border-white/5 uppercase tracking-widest text-xs">
                      Hủy
@@ -1086,17 +1093,47 @@ export default function AdminView() {
                      if (cb) cb();
                    }} 
                    className={`px-6 py-3 rounded-xl uppercase tracking-widest text-xs transition-all hover:scale-[1.03] ${
-                     modal.type === 'success' ? 'bg-green-500 text-white hover:bg-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]' :
                      modal.type === 'confirm' ? 'bg-red-600 hover:bg-red-500 text-white' : 
                      'bg-white text-black hover:bg-white/90'
                    }`}
                  >
-                   {modal.type === 'confirm' ? 'XÁC NHẬN' : modal.type === 'success' ? 'Tuyệt Vời!' : 'Đã Rõ'}
+                   {modal.type === 'confirm' ? 'XÁC NHẬN' : 'Đã Rõ'}
                  </button>
               </div>
            </div>
         </div>
       )}
+
+      {/* Success Toast Notification */}
+      <div className={`fixed top-20 right-4 md:right-8 z-[200] transition-all duration-500 ease-out ${
+        toast.show ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
+      }`}>
+        <div className="bg-[#111] border border-green-500/30 rounded-2xl p-5 shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(34,197,94,0.15)] max-w-sm w-[340px] relative overflow-hidden">
+          {/* Green glow */}
+          <div className="absolute -top-10 -left-10 w-28 h-28 bg-green-500/15 rounded-full blur-2xl pointer-events-none" />
+          
+          <div className="flex items-start gap-3.5 relative z-10">
+            <div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/30 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,197,94,0.3)]">
+              <CheckCircle2 size={20} className="text-green-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-bold text-white tracking-tight">{toast.title}</h4>
+              <p className="text-white/50 text-xs mt-1 leading-relaxed">{toast.message}</p>
+            </div>
+            <button 
+              onClick={() => setToast({ show: false, title: '', message: '' })}
+              className="text-white/30 hover:text-white text-lg leading-none mt-0.5 shrink-0 transition-colors"
+            >
+              ×
+            </button>
+          </div>
+          
+          {/* Auto-dismiss progress bar */}
+          {toast.show && (
+            <div className="absolute bottom-0 left-0 h-0.5 bg-green-500/50 rounded-full animate-[shrink_3.5s_linear_forwards]" style={{ width: '100%' }} />
+          )}
+        </div>
+      </div>
 
       {/* Edit Project Images Modal */}
       {editingProject && (

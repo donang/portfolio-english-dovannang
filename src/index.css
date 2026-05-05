@@ -226,3 +226,8 @@
     offset-distance: 100%;
   }
 }
+
+@keyframes shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
