@@ -334,31 +334,6 @@
             </div>
         </footer>
     </div>
-    <!-- LỚP BẢO VỆ CHỐNG COPY -->
-    <style>
-        /* Chặn bôi đen toàn bộ trang */
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-    </style>
-    <script>
-        // 1. Chặn chuột phải
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        
-        // 2. Chặn các phím tắt F12, Ctrl+U, Ctrl+S, Ctrl+C, Ctrl+Shift+I
-        document.addEventListener('keydown', function(e) {
-            if (e.keyCode === 123 || // F12
-               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I hoặc J
-               (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 67))) { // Ctrl+U, S, C
-                e.preventDefault();
-            }
-        });
 
-        // 3. Chặn kéo thả hình ảnh ra ngoài
-        document.addEventListener('dragstart', event => event.preventDefault());
-    </script>
 </body>
 </html>
