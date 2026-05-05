@@ -57,37 +57,39 @@ const Header = () => {
         }
       });
 
-      // 5. Tạo Shadow DOM để tách biệt CSS
-      const host = document.createElement('div');
-      host.style.position = 'fixed';
-      host.style.top = '-9999px';
-      host.style.left = '0';
-      host.style.width = '794px';
-      host.style.zIndex = '-1';
-      document.body.appendChild(host);
+      // 5. Tạo container ẩn + CSS tách biệt
+      const container = document.createElement('div');
+      container.id = 'cv-pdf-render';
+      container.style.position = 'fixed';
+      container.style.top = '-9999px';
+      container.style.left = '0';
+      container.style.width = '794px';
+      container.style.zIndex = '-1';
 
-      const shadow = host.attachShadow({ mode: 'open' });
-
-      // Thêm font Google
       const fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
       fontLink.href = 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Qwitcher+Grypen:wght@400;700&family=Dancing+Script:wght@400;500;600;700&display=swap';
-      shadow.appendChild(fontLink);
+      document.head.appendChild(fontLink);
 
-      // Thêm CSS gốc + override fit A4
-      const style = document.createElement('style');
-      style.textContent = `
-        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+      const styleEl = document.createElement('style');
+      styleEl.id = 'cv-pdf-style';
+      styleEl.textContent = `
+        #cv-pdf-render *,#cv-pdf-render *::before,#cv-pdf-render *::after{margin:0;padding:0;box-sizing:border-box}
+        #cv-pdf-render {font-family:'Montserrat',sans-serif;background:#0c0c1d;color:#fff;-webkit-font-smoothing:antialiased;}
         ${cssText}
-        .page{width:794px!important;height:1123px!important;max-height:1123px!important;margin:0!important;overflow:hidden!important;background:#0c0c1d;}
       `;
-      shadow.appendChild(style);
-      shadow.appendChild(page);
+      document.head.appendChild(styleEl);
+
+      container.appendChild(page);
+      document.body.appendChild(container);
 
       // 6. Chờ font và ảnh load
       await new Promise(r => setTimeout(r, 3000));
 
-      // 7. Xuất PDF
+      // 7. Xuất PDF - dùng kích thước thực tế của nội dung
+      const w = page.scrollWidth;
+      const h = page.scrollHeight;
+
       const opt = {
         margin: 0,
         filename: 'CV_Do_Van_Nang.pdf',
@@ -97,14 +99,18 @@ const Header = () => {
           useCORS: true, 
           letterRendering: true,
           scrollY: 0,
-          width: 794,
-          height: 1123
+          width: w,
+          height: h
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: { unit: 'px', format: [w, h], orientation: 'portrait', hotfixes: ['px_scaling'] }
       };
 
       await window.html2pdf().set(opt).from(page).save();
-      document.body.removeChild(host);
+
+      // Dọn dẹp
+      document.body.removeChild(container);
+      document.head.removeChild(styleEl);
+      document.head.removeChild(fontLink);
       setIsDownloading(false);
     } catch (err) {
       alert('Lỗi tải CV: ' + err.message);
