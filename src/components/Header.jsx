@@ -27,7 +27,9 @@ const Header = () => {
           const element = doc.querySelector('.page');
           
           if (!element) {
-              console.error("Không tìm thấy .page trong CV");
+          if (!element) {
+              const htmlContent = doc.body.innerHTML.substring(0, 100);
+              alert("Lỗi: Không tìm thấy nội dung CV. Có thể sai đường dẫn. Nội dung nhận được: " + htmlContent);
               setIsDownloading(false);
               document.body.removeChild(iframe);
               return;
@@ -45,14 +47,14 @@ const Header = () => {
             setIsDownloading(false);
             document.body.removeChild(iframe);
           }).catch(err => {
-            console.error("Lỗi xuất PDF:", err);
+            alert("Lỗi xuất PDF: " + err.message);
             setIsDownloading(false);
             document.body.removeChild(iframe);
           });
         };
         doc.head.appendChild(script);
       } catch (err) {
-        console.error("Lỗi iframe:", err);
+        alert("Lỗi iframe: " + err.message);
         setIsDownloading(false);
         document.body.removeChild(iframe);
       }
