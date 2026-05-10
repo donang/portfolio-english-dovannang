@@ -57,7 +57,7 @@ export default function AdminView() {
   const [activeFilter, setActiveFilter] = useState('All');
 
   // Language switcher: 'en' = English, 'vi' = Vietnamese
-  const [adminLang, setAdminLang] = useState('en');
+  const [adminLang, setAdminLang] = useState('vi');
   const projectsCol = adminLang === 'en' ? 'projects_en' : 'projects';
   const profileDocId = adminLang === 'en' ? 'english' : 'main';
   
