@@ -495,16 +495,18 @@ export default function AdminView() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-white/[0.02] blur-[120px] rounded-full pointer-events-none"></div>
 
       {/* Top Navigation Bar (Sleek, Modern) */}
-      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-black/50 backdrop-blur-2xl z-50 flex items-center justify-between px-2 md:px-8 gap-1 md:gap-4">
-        <div className="flex items-center gap-3 shrink-0 z-10">
+      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-black/50 backdrop-blur-2xl z-50 flex items-center justify-between px-2 md:px-8">
+        
+        {/* Left Side */}
+        <div className="flex-1 flex items-center gap-3 z-10 min-w-0">
            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)] shrink-0">
              <Star className="text-black" size={16} fill="currentColor"/>
            </div>
-           <span className="font-semibold text-sm tracking-tight hidden sm:block">Workspace</span>
+           <span className="font-semibold text-sm tracking-tight hidden sm:block truncate">Workspace</span>
         </div>
         
         {/* Center Pill Navigation */}
-        <div className="flex items-center justify-center flex-1 md:absolute md:left-1/2 md:-translate-x-1/2 z-0">
+        <div className="shrink-0 flex items-center justify-center z-0">
           <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-xl">
              <button 
                 onClick={() => setActiveTab('portfolio')} 
@@ -521,7 +523,8 @@ export default function AdminView() {
            </div>
          </div>
          
-         <div className="flex items-center gap-1 md:gap-2 shrink-0 z-10">
+         {/* Right Side */}
+         <div className="flex-1 flex items-center justify-end gap-1 md:gap-2 z-10 min-w-0">
            {/* Language Switcher */}
            <div className="flex items-center gap-0.5 p-0.5 bg-white/5 border border-white/10 rounded-lg">
               <button 
