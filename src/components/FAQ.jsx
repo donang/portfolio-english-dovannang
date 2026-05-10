@@ -9,25 +9,25 @@ export default function FAQ() {
 
   const defaultFaqs = [
     {
-      q: "Thiết kế một dự án Nhận Diện Thương Hiệu mất bao lâu?",
-      a: "Tùy thuộc vào quy mô, trung bình một dự án Branding từ bước Research, Phác thảo Concept đến Final Design cần khoảng 2-3 tuần. Tuy nhiên với các ấn phẩm lẻ (Banner, Packaging, Poster), mình sẽ bàn giao cực mượt trong 3-5 ngày, cam kết tuân thủ chặt chẽ Timeline đã chốt."
+      q: "How long does a Brand Identity project take?",
+      a: "Depending on the scale, a Branding project typically takes 2-3 weeks from Research and Concept Sketching to Final Design. For individual items (Banners, Packaging, Posters), I can deliver them smoothly within 3-5 days, strictly adhering to the agreed timeline."
     },
     {
-      q: "Khách hàng sẽ nhận được định dạng File nào khi nghiệm thu?",
-      a: "Bạn sẽ nhận được trọn bộ Package Bàn Giao chuẩn mực nhất: File Graphic gốc chất lượng cao (.AI, .PSD), file in ấn (.PDF) chuẩn thiết lập hệ màu CMYK, và các File tối ưu hiển thị Digital (.PNG/.JPG). Toàn bộ File Layer đều được quản lý khoa học, cực kỳ thuận tiện cho bạn tái sử dụng."
+      q: "What file formats will I receive upon handover?",
+      a: "You will receive a standard Handover Package: High-quality original Graphic files (.AI, .PSD), print-ready files (.PDF) configured in CMYK, and optimized files for Digital display (.PNG/.JPG). All layers are scientifically managed for your ultimate convenience."
     },
     {
-      q: "Chính sách hỗ trợ chỉnh sửa (Revisions) như thế nào?",
-      a: "Mình cực kỳ xem trọng sự hoàn hảo của sản phẩm cuối, nên mỗi ấn phẩm thiết kế luôn tặng kèm 2-3 vòng chỉnh sửa (Feedback Revisions) hoàn toàn miễn phí. Đôi bên sẽ cùng nhau tinh chỉnh Màu sắc, Typography và bố cục cho tới khi Visual thực sự đáp ứng đúng nhu cầu của bạn."
+      q: "What is the revision support policy?",
+      a: "I highly value the perfection of the final product, so each design includes 2-3 rounds of free feedback revisions. We will collaboratively refine Colors, Typography, and Layout until the Visual truly meets your needs."
     },
     {
-      q: "Chi phí thiết kế được tính toán và báo giá ra sao?",
-      a: "Mình không dùng một mức giá cào bằng. Mọi báo giá đều được minh bạch hóa theo hình thức Trọn gói (Lump Sum) dựa trên Scope of Work chi tiết (độ phức tạp của Concept, số lượng ấn phẩm). Đảm bảo 100% không phát sinh bất kỳ khoản phụ phí vô lý nào nếu yêu cầu cốt lõi ngay từ đầu không thay đổi."
+      q: "How are design costs calculated and quoted?",
+      a: "I don't use a one-size-fits-all price. All quotes are transparently provided as a Lump Sum based on a detailed Scope of Work (concept complexity, number of items). I guarantee 100% no hidden fees if the core requirements remain unchanged."
     }
   ];
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
+    const unsub = onSnapshot(doc(db, 'profile', 'english'), (docSnap) => {
       if (docSnap.exists() && docSnap.data().faqs && docSnap.data().faqs.length > 0) {
         setFaqs(docSnap.data().faqs);
       } else {
@@ -66,7 +66,7 @@ export default function FAQ() {
              </h2>
              
              <p className="text-textMuted text-[15px] leading-[1.8] font-sans max-w-sm pl-4 border-l-2 border-white/10">
-               Dưới đây là cẩm nang giải đáp cực kỳ nhanh gọn cho các thắc mắc cốt lõi nhất về quy trình làm việc, báo giá và chính sách hỗ trợ thiết kế. 
+               Below is a quick guide addressing the most essential questions regarding workflow, pricing, and design support policies. 
              </p>
           </div>
 

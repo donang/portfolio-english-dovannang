@@ -193,7 +193,7 @@ export default function SkillsAboutContact() {
   });
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
+    const unsub = onSnapshot(doc(db, 'profile', 'english'), (docSnap) => {
        if (docSnap.exists()) {
            const data = docSnap.data();
            
@@ -219,14 +219,14 @@ export default function SkillsAboutContact() {
       {/* Skills */}
       <div className="bg-[#0b0c10] border border-white/5 rounded-2xl p-5 md:p-8 flex flex-col gap-6 relative overflow-hidden" id="skills">
         <h3 className="text-[14px] font-extrabold flex items-center gap-2 font-sans tracking-widest uppercase">
-          <Zap className="text-orange-500 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={18} /> KỸ NĂNG CỦA MÌNH
+          <Zap className="text-orange-500 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={18} /> MY SKILLS
         </h3>
 
         <div className="w-full flex-1 flex flex-col items-center justify-start min-h-[300px]">
            {skillsList.length > 0 ? (
               <SolarSystem3D skills={skillsList} />
            ) : (
-              <p className="text-sm text-textMuted text-center border border-dashed border-white/10 rounded-xl py-6 w-full">Vui lòng nhập tối thiểu 1 kỹ năng trên Admin để kích hoạt Quỹ Đạo Đa Lớp.</p>
+              <p className="text-sm text-textMuted text-center border border-dashed border-white/10 rounded-xl py-6 w-full">Please enter at least 1 skill in Admin to activate the Orbital System.</p>
            )}
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function SkillsAboutContact() {
       {/* Experience (formerly About) */}
       <div className="bg-[#0b0c10] border border-white/5 rounded-2xl p-5 md:p-8 flex flex-col gap-6 relative overflow-hidden" id="about">
         <h3 className="text-[14px] font-extrabold flex items-center gap-2 font-sans tracking-widest uppercase">
-          <Briefcase className="text-orange-500 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={18} /> KINH NGHIỆM LÀM VIỆC
+          <Briefcase className="text-orange-500 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={18} /> WORK EXPERIENCE
         </h3>
 
         <div className="flex flex-col gap-1 mt-2">
@@ -256,7 +256,7 @@ export default function SkillsAboutContact() {
                          return `${m}/${y}`; 
                       };
                       const s = fm(exp.startDate);
-                      const e = exp.isCurrent ? 'Hiện tại' : (exp.endDate ? fm(exp.endDate) : '?');
+                      const e = exp.isCurrent ? 'Present' : (exp.endDate ? fm(exp.endDate) : '?');
                       return `${s} - ${e}`;
                    })() : exp.period}
                  </span>
@@ -287,7 +287,7 @@ export default function SkillsAboutContact() {
           <div className="flex gap-3 items-start">
             <Quote className="text-primary/60 shrink-0 mt-0.5" size={18} />
             <p className="text-[13px] text-textMuted/80 italic leading-relaxed">
-              "Thiết kế không chỉ là tạo ra lớp áo đẹp, mà là quá trình biến những ý tưởng phức tạp thành trải nghiệm thị giác tuyệt vời."
+              "Design is not just making things look beautiful; it's the process of turning complex ideas into incredible visual experiences."
             </p>
           </div>
         </div>
@@ -296,7 +296,7 @@ export default function SkillsAboutContact() {
       {/* Contact */}
       <div className="bg-[#0b0c10] border border-white/5 rounded-2xl p-5 md:p-8 flex flex-col gap-6 relative overflow-hidden" id="contact">
         <h3 className="text-[14px] font-extrabold flex items-center gap-2 font-sans tracking-widest uppercase">
-          <Send className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={18} /> LIÊN HỆ VỚI MÌNH
+          <Send className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={18} /> CONTACT ME
         </h3>
 
         <div className="flex flex-col gap-5 mt-2">
@@ -315,7 +315,7 @@ export default function SkillsAboutContact() {
               <Phone size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-textMuted">Điện thoại</p>
+              <p className="text-[11px] text-textMuted">Phone</p>
               <p className="text-[13px] font-semibold truncate mt-0.5 text-white/90">{contactInfo.phone}</p>
             </div>
           </div>
@@ -325,7 +325,7 @@ export default function SkillsAboutContact() {
               <MapPin size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-textMuted">Địa chỉ</p>
+              <p className="text-[11px] text-textMuted">Address</p>
               <p className="text-[13px] font-semibold truncate mt-0.5 text-white/90">{contactInfo.address}</p>
             </div>
           </div>
@@ -346,7 +346,7 @@ export default function SkillsAboutContact() {
           rel="noopener noreferrer"
           className="mt-6 w-full py-3.5 rounded-lg bg-gradient-to-r from-orange-400 via-primary to-purple-600 font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(255,42,133,0.4)] hover:shadow-[0_0_30px_rgba(255,42,133,0.6)] active:scale-95 text-white text-[12px] uppercase tracking-widest"
         >
-          CHAT VỚI MÌNH QUA ZALO <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" className="w-5 h-5 ml-1" />
+          CHAT WITH ME VIA ZALO <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" className="w-5 h-5 ml-1" />
         </a>
       </div>
     </section>

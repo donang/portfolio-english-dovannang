@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-4">
 
         <p className="text-sm text-textMuted">
-          © 2024 Đỗ Văn Năng. All Rights Reserved.
+          © 2024 Do Van Nang. All Rights Reserved.
         </p>
 
         <button
@@ -22,7 +22,7 @@ export default function Footer() {
         </button>
 
         <p className="text-sm text-textMuted">
-          Thiết kế và phát triển với <span className="text-red-500">❤️</span> bởi Đỗ Văn Năng
+          Designed and developed with <span className="text-red-500">❤️</span> by Do Van Nang
         </p>
 
       </div>

@@ -82,16 +82,16 @@ export default function Hero() {
 
         <div className="flex flex-col items-center lg:items-start w-full">
           <div className="text-[13px] md:text-[14px] xl:text-[16px] font-medium tracking-[0.02em] flex items-center justify-center lg:justify-start relative z-20 mb-4 md:mb-5 lg:mb-6">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2e8f0] to-[#b8c2d1] mr-1.5">Xin chào</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2e8f0] to-[#b8c2d1] mr-1.5">Hello</span>
             <span className="animate-waving-hand inline-block origin-bottom-right drop-shadow-md text-white text-[16px] md:text-[18px]">👋</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2e8f0] to-[#b8c2d1] ml-0.5">! Mình là</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2e8f0] to-[#b8c2d1] ml-0.5">! I'm</span>
           </div>
 
           <h1 className="text-[2rem] min-[380px]:text-[2.3rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[5.2rem] xl:text-[5.8rem] font-extrabold tracking-tight whitespace-nowrap z-10 flex flex-row items-center justify-center lg:justify-start" style={{ lineHeight: '1.1' }}>
-            <span className="text-white drop-shadow-none md:drop-shadow-[0_2px_10px_rgba(255,255,255,0.3)] mr-2 md:mr-4">ĐỖ VĂN</span>
+            <span className="text-white drop-shadow-none md:drop-shadow-[0_2px_10px_rgba(255,255,255,0.3)] mr-2 md:mr-4">DO VAN</span>
             <span className="drop-shadow-none md:drop-shadow-[0_4px_15px_rgba(255,42,133,0.5)]">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff2a85] via-[#b266ff] to-[#00c3ff]">
-                NĂNG
+                NANG
               </span>
             </span>
           </h1>
@@ -122,7 +122,7 @@ export default function Hero() {
         </div>
 
         <p className="text-[#a0aec0] text-[14px] md:text-[15px] xl:text-[16px] leading-[1.8] max-w-[90%] md:max-w-[480px] xl:max-w-[500px] mt-1 font-normal mx-auto lg:mx-0">
-          Mình chuyên thiết kế poster, banner, social media design và nhận diện thương hiệu, giúp thương hiệu của bạn nổi bật và thu hút hơn.
+          I specialize in crafting posters, banners, social media designs, and brand identities, helping your brand stand out and leave a lasting impression.
         </p>
 
         <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4 mt-5 w-full">
@@ -130,7 +130,7 @@ export default function Hero() {
             onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })} 
             className="bg-gradient-to-r from-[#ff2a85] to-[#7000FF] hover:from-[#ff1475] hover:to-[#5e00db] text-white rounded-full px-7 xl:px-8 py-3 shadow-none md:shadow-[0_10px_30px_-10px_rgba(255,42,133,0.8)] text-[11px] xl:text-[12px] font-bold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] flex items-center group"
           >
-            XEM DỰ ÁN <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+            VIEW PROJECTS <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
           </button>
 
           <a 
@@ -141,7 +141,7 @@ export default function Hero() {
             }}
             className="border-[1.5px] border-white/20 hover:bg-white/5 text-white rounded-full px-7 xl:px-8 py-3 shadow-lg backdrop-blur-sm text-[11px] xl:text-[12px] font-bold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] flex items-center group"
           >
-            LIÊN HỆ NGAY <Send size={14} className="ml-2 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+            CONTACT ME <Send size={14} className="ml-2 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
           </a>
         </div>
 

@@ -75,7 +75,7 @@ const Header = () => {
           {/* AI Generated Pure Logo N */}
           <div className="flex items-center justify-center shrink-0 pr-1 group cursor-pointer">
             <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-[10px] md:rounded-xl overflow-hidden shadow-[0_2px_15px_rgba(255,42,133,0.3)] group-hover:shadow-[0_4px_20px_rgba(255,42,133,0.6)] group-hover:scale-105 transition-all duration-300 border border-white/10 flex items-center justify-center">
-              <img src={`${import.meta.env.BASE_URL}logo_n.png`} alt="Đỗ Văn Năng Logo" className="w-full h-full object-cover scale-[1.15]" />
+              <img src={`${import.meta.env.BASE_URL}logo_n.png`} alt="Do Van Nang Logo" className="w-full h-full object-cover scale-[1.15]" />
             </div>
           </div>
           
@@ -83,10 +83,10 @@ const Header = () => {
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1.5 -mb-0.5">
                 <span className="text-[18px] md:text-[22px] font-bold tracking-tight font-sans text-white leading-tight">
-                   Đỗ Văn
+                   Do Van
                 </span>
                 <span className="text-[18px] md:text-[22px] font-bold tracking-tight font-sans bg-clip-text text-transparent bg-gradient-to-br from-purple-400 to-primary leading-tight pr-1 py-1">
-                   Năng
+                   Nang
                 </span>
             </div>
             <span className="text-[8px] md:text-[9.5px] text-textMuted uppercase tracking-[0.25em] font-bold leading-none lg:-mt-0.5">
@@ -97,27 +97,27 @@ const Header = () => {
 
       <nav className="flex items-center flex-nowrap gap-6 md:gap-10 text-[13px] md:text-sm overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 md:px-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
         <a href="#home" onClick={(e) => handleClick(e, 'home')} className={`whitespace-nowrap shrink-0 ${getLinkClass('home')}`}>
-          <span className={getTextStyle('home')}>Trang chủ</span>
+          <span className={getTextStyle('home')}>Home</span>
           {activeIndicator(activeSection === 'home')}
         </a>
 
         <a href="#projects" onClick={(e) => handleClick(e, 'projects')} className={`whitespace-nowrap shrink-0 ${getLinkClass('projects')}`}>
-          <span className={getTextStyle('projects')}>Dự án</span>
+          <span className={getTextStyle('projects')}>Projects</span>
           {activeIndicator(activeSection === 'projects')}
         </a>
 
         <a href="#skills" onClick={(e) => handleClick(e, 'skills')} className={`whitespace-nowrap shrink-0 ${getLinkClass('skills')}`}>
-          <span className={getTextStyle('skills')}>Kỹ năng</span>
+          <span className={getTextStyle('skills')}>Skills</span>
           {activeIndicator(activeSection === 'skills')}
         </a>
 
         <a href="#about" onClick={(e) => handleClick(e, 'about')} className={`whitespace-nowrap shrink-0 ${getLinkClass('about')}`}>
-          <span className={getTextStyle('about')}>Về mình</span>
+          <span className={getTextStyle('about')}>About Me</span>
           {activeIndicator(activeSection === 'about')}
         </a>
 
         <a href="#contact" onClick={(e) => handleClick(e, 'contact')} className={`whitespace-nowrap shrink-0 ${getLinkClass('contact')}`}>
-          <span className={getTextStyle('contact')}>Liên hệ</span>
+          <span className={getTextStyle('contact')}>Contact</span>
           {activeIndicator(activeSection === 'contact')}
         </a>
       </nav>
@@ -128,7 +128,7 @@ const Header = () => {
           disabled={isDownloading}
           className={`flex items-center text-white rounded-xl text-[11px] font-semibold px-6 py-2.5 transition-all shadow-[0_0_20px_rgba(112,0,255,0.15)] border border-purple-500/50 ${isDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
         >
-          {isDownloading ? 'ĐANG XUẤT PDF...' : 'TẢI CV'} 
+          {isDownloading ? 'EXPORTING PDF...' : 'DOWNLOAD CV'} 
           {isDownloading ? <Loader2 size={14} className="ml-2 opacity-80 animate-spin" /> : <Download size={14} className="ml-2 opacity-80" />}
         </button>
       </div>

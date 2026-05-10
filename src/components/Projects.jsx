@@ -5,17 +5,17 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Link } from 'react-router-dom';
 
-const categories = ['Tất cả', 'Poster', 'Banner', 'Social Media', 'Branding', 'Thumbnail', 'Others'];
+const categories = ['All', 'Poster', 'Banner', 'Social Media', 'Branding', 'Thumbnail', 'Others'];
 
 const defaultProjects = [
-  { id: 'mock1', title: 'Poster Quảng Cáo Đồ Ăn', category: 'Poster Design', color: 'bg-red-900/50', image: '' },
-  { id: 'mock2', title: 'Banner Khuyến Mãi', category: 'Banner Design', color: 'bg-green-900/50', image: '' },
-  { id: 'mock3', title: 'Bộ Nhận Diện Thương Hiệu', category: 'Branding Design', color: 'bg-emerald-900/50', image: '' },
+  { id: 'mock1', title: 'Food Advertising Poster', category: 'Poster Design', color: 'bg-red-900/50', image: '' },
+  { id: 'mock2', title: 'Promotional Banner', category: 'Banner Design', color: 'bg-green-900/50', image: '' },
+  { id: 'mock3', title: 'Brand Identity', category: 'Branding Design', color: 'bg-emerald-900/50', image: '' },
   { id: 'mock4', title: 'Social Post Facebook', category: 'Social Media Design', color: 'bg-blue-900/50', image: '' },
 ];
 
 export default function Projects({ limit }) {
-  const [activeTab, setActiveTab] = useState('Tất cả');
+  const [activeTab, setActiveTab] = useState('All');
   const [dbProjects, setDbProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLightboxProject, setSelectedLightboxProject] = useState(null);
@@ -59,7 +59,7 @@ export default function Projects({ limit }) {
   }, [selectedLightboxProject, currentImageIndex]);
 
   useEffect(() => {
-    const q = query(collection(db, 'projects'), orderBy('createdAt', 'asc'));
+    const q = query(collection(db, 'projects_en'), orderBy('createdAt', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const projs = [];
       snapshot.forEach((doc) => {
@@ -93,11 +93,11 @@ export default function Projects({ limit }) {
     return idx === -1 ? 99 : idx;
   };
 
-  let filteredProjects = activeTab === 'Tất cả'
+  let filteredProjects = activeTab === 'All'
     ? displayProjects
     : displayProjects.filter(p => p.category === activeTab || p.category?.replace(' Design', '') === activeTab || p.category === activeTab + ' Design');
 
-  if (activeTab === 'Tất cả') {
+  if (activeTab === 'All') {
     filteredProjects = [...filteredProjects].sort((a, b) => {
       const weightA = getCategoryWeight(a.category);
       const weightB = getCategoryWeight(b.category);
@@ -144,7 +144,7 @@ export default function Projects({ limit }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 z-10" />
           {project.images?.length > 1 && (
             <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20 backdrop-blur-sm border border-white/20">
-              {project.images.length} ẢNH
+              {project.images.length} PICS
             </div>
           )}
           <div className="absolute top-2 left-2 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-300 z-20">
@@ -192,13 +192,13 @@ export default function Projects({ limit }) {
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-4">
         <h2 className="text-3xl md:text-4xl font-extrabold uppercase tracking-widest font-sans flex items-center gap-3">
-          <span className="text-white drop-shadow-md">DỰ ÁN</span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-primary drop-shadow-[0_0_15px_rgba(255,42,133,0.3)] inline-block pb-2 pt-3 -mb-2 -mt-3">NỔI BẬT</span>
+          <span className="text-white drop-shadow-md">FEATURED</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-primary drop-shadow-[0_0_15px_rgba(255,42,133,0.3)] inline-block pb-2 pt-3 -mb-2 -mt-3">PROJECTS</span>
         </h2>
 
         {limit && (
           <button onClick={() => setShowAllOverlay(true)} className="text-[11px] text-textMuted hover:text-white uppercase tracking-[0.2em] font-bold flex items-center transition-colors group">
-            XEM TẤT CẢ DỰ ÁN <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+            VIEW ALL PROJECTS <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
           </button>
         )}
       </div>
@@ -223,7 +223,7 @@ export default function Projects({ limit }) {
           {loading ? (
             <div className="col-span-full flex items-center justify-center text-primary h-48">
               <Loader2 className="animate-spin" size={32} />
-              <span className="ml-2 font-bold uppercase tracking-wider text-sm">Đang tải dự án...</span>
+              <span className="ml-2 font-bold uppercase tracking-wider text-sm">Loading projects...</span>
             </div>
           ) : finalProjects.map((project, idx) => (
             <div key={project.id} className="transition-all duration-500 hover:scale-[1.02] gallery-item" style={{ animationDelay: `${idx * 0.08}s` }}>
@@ -307,8 +307,8 @@ export default function Projects({ limit }) {
             {/* Top Sticky Navigation Bar */}
             <div className="shrink-0 w-full z-50 px-6 py-4 md:px-10 md:py-6 flex items-center justify-between border-b border-white/5 bg-[#0f1118]/80 backdrop-blur-md shadow-lg">
               <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-widest font-sans flex items-center gap-3">
-                <span className="text-white drop-shadow-md">KHO</span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-primary drop-shadow-[0_0_15px_rgba(255,42,133,0.3)]">CHÍNH</span>
+                <span className="text-white drop-shadow-md">MAIN</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-primary drop-shadow-[0_0_15px_rgba(255,42,133,0.3)]">GALLERY</span>
               </h2>
 
               <button

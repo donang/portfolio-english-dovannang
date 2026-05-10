@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Upload, Lock, AlertCircle, CheckCircle2, Image as ImageIcon, Trash2, LayoutDashboard, Settings as SettingsIcon, LogOut, BarChart3, FolderHeart, ImageIcon as MImageIcon, ChevronDown, ChevronLeft, ChevronRight, User, PlusCircle, Save, Briefcase, Calendar, MessageCircle, ArrowLeft, ArrowRight, Star, GripVertical } from 'lucide-react';
-import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, updateDoc, where, setDoc } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, updateDoc, where, setDoc, getDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
@@ -11,7 +11,7 @@ export default function AdminView() {
     const oldHref = link?.href;
     if (link) link.href = import.meta.env.BASE_URL + 'favicon-admin.svg?v=2';
     return () => {
-      document.title = 'Portfolio Đỗ Văn Năng';
+      document.title = 'Portfolio Do Van Nang';
       if (link) link.href = import.meta.env.BASE_URL + 'favicon-cv.svg?v=2';
     };
   }, []);
@@ -84,27 +84,27 @@ export default function AdminView() {
 
   const defaultFaqs = [
     {
-      q: "Thiết kế một dự án Nhận Diện Thương Hiệu mất bao lâu?",
-      a: "Tùy thuộc vào quy mô, trung bình một dự án Branding từ bước Research, Phác thảo Concept đến Final Design cần khoảng 2-3 tuần. Tuy nhiên với các ấn phẩm lẻ (Banner, Packaging, Poster), mình sẽ bàn giao cực mượt trong 3-5 ngày, cam kết tuân thủ chặt chẽ Timeline đã chốt."
+      q: "How long does a Brand Identity project take?",
+      a: "Depending on the scale, a Branding project typically takes 2-3 weeks from Research and Concept Sketching to Final Design. For individual items (Banners, Packaging, Posters), I can deliver them smoothly within 3-5 days, strictly adhering to the agreed timeline."
     },
     {
-      q: "Khách hàng sẽ nhận được định dạng File nào khi nghiệm thu?",
-      a: "Bạn sẽ nhận được trọn bộ Package Bàn Giao chuẩn mực nhất: File Graphic gốc chất lượng cao (.AI, .PSD), file in ấn (.PDF) chuẩn thiết lập hệ màu CMYK, và các File tối ưu hiển thị Digital (.PNG/.JPG). Toàn bộ File Layer đều được quản lý khoa học, cực kỳ thuận tiện cho bạn tái sử dụng."
+      q: "What file formats will I receive upon handover?",
+      a: "You will receive a standard Handover Package: High-quality original Graphic files (.AI, .PSD), print-ready files (.PDF) configured in CMYK, and optimized files for Digital display (.PNG/.JPG). All layers are scientifically managed for your ultimate convenience."
     },
     {
-      q: "Chính sách hỗ trợ chỉnh sửa (Revisions) như thế nào?",
-      a: "Mình cực kỳ xem trọng sự hoàn hảo của sản phẩm cuối, nên mỗi ấn phẩm thiết kế luôn tặng kèm 2-3 vòng chỉnh sửa (Feedback Revisions) hoàn toàn miễn phí. Đôi bên sẽ cùng nhau tinh chỉnh Màu sắc, Typography và bố cục cho tới khi Visual thực sự đáp ứng đúng nhu cầu của bạn."
+      q: "What is the revision support policy?",
+      a: "I highly value the perfection of the final product, so each design includes 2-3 rounds of free feedback revisions. We will collaboratively refine Colors, Typography, and Layout until the Visual truly meets your needs."
     },
     {
-      q: "Chi phí thiết kế được tính toán và báo giá ra sao?",
-      a: "Mình không dùng một mức giá cào bằng. Mọi báo giá đều được minh bạch hóa theo hình thức Trọn gói (Lump Sum) dựa trên Scope of Work chi tiết (độ phức tạp của Concept, số lượng ấn phẩm). Đảm bảo 100% không phát sinh bất kỳ khoản phụ phí vô lý nào nếu yêu cầu cốt lõi ngay từ đầu không thay đổi."
+      q: "How are design costs calculated and quoted?",
+      a: "I don't use a one-size-fits-all price. All quotes are transparently provided as a Lump Sum based on a detailed Scope of Work (concept complexity, number of items). I guarantee 100% no hidden fees if the core requirements remain unchanged."
     }
   ];
 
   useEffect(() => {
     if (!isAuthenticated) return;
     
-    const qProjects = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    const qProjects = query(collection(db, 'projects_en'), orderBy('createdAt', 'desc'));
     const unsubProjects = onSnapshot(qProjects, (snapshot) => {
       const projs = [];
       snapshot.forEach((dt) => {
@@ -113,7 +113,7 @@ export default function AdminView() {
       setProjects(projs);
     });
 
-    const unsubProfile = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
+    const unsubProfile = onSnapshot(doc(db, 'profile', 'english'), (docSnap) => {
         if (docSnap.exists()) {
             const dbData = docSnap.data();
             if (!dbData.faqs || dbData.faqs.length === 0) {
@@ -209,7 +209,7 @@ export default function AdminView() {
           }
   
           const newlyMergedImages = [...oldImages, ...uploadedUrls];
-          await updateDoc(doc(db, 'projects', project.id), { images: newlyMergedImages });
+          await updateDoc(doc(db, 'projects_en', project.id), { images: newlyMergedImages });
           setEditingProject({ ...project, images: newlyMergedImages });
   
           setProgress(100);
@@ -251,7 +251,7 @@ export default function AdminView() {
         setProgress(90);
 
         const projectTitleTerm = projectTitle || 'Không tên';
-        const qSearch = query(collection(db, 'projects'), where('title', '==', projectTitleTerm));
+        const qSearch = query(collection(db, 'projects_en'), where('title', '==', projectTitleTerm));
         const querySnapshot = await getDocs(qSearch);
 
         let projectToEdit = null;
@@ -266,7 +266,7 @@ export default function AdminView() {
                 oldImages = [existingData.imageUrl];
             }
             const newlyMergedImages = [...oldImages, ...uploadedUrls];
-            await updateDoc(doc(db, 'projects', existingDoc.id), { images: newlyMergedImages });
+            await updateDoc(doc(db, 'projects_en', existingDoc.id), { images: newlyMergedImages });
             projectToEdit = { id: existingDoc.id, ...existingData, images: newlyMergedImages };
         } else {
             const newProjectData = {
@@ -275,7 +275,7 @@ export default function AdminView() {
                 images: uploadedUrls,
                 createdAt: new Date().getTime()
             };
-            const newDocRef = await addDoc(collection(db, 'projects'), newProjectData);
+            const newDocRef = await addDoc(collection(db, 'projects_en'), newProjectData);
             projectToEdit = { id: newDocRef.id, ...newProjectData };
         }
 
@@ -297,7 +297,7 @@ export default function AdminView() {
 
   const handleDelete = (id) => {
     showConfirm('Xác nhận xóa dự án', 'Bạn có chắc chắn muốn xóa toàn bộ dự án này cùng tất cả ảnh trong đó không? Hành động này không thể hoàn tác.', async () => {
-      await deleteDoc(doc(db, 'projects', id));
+      await deleteDoc(doc(db, 'projects_en', id));
       if (editingProject && editingProject.id === id) setEditingProject(null);
     });
   };
@@ -305,7 +305,7 @@ export default function AdminView() {
   const handleRemoveSingleImage = async (project, imageIndexToRemove) => {
     if (!project.images || project.images.length <= 1) {
        showConfirm('Xóa ảnh cuối cùng', 'Đây là bức ảnh cuối cùng của dự án. Nếu xóa, toàn bộ bìa dự án này sẽ biến mất. Bạn vẫn muốn tiếp tục?', async () => {
-           await deleteDoc(doc(db, 'projects', project.id));
+           await deleteDoc(doc(db, 'projects_en', project.id));
            setEditingProject(null);
        });
        return;
@@ -313,7 +313,7 @@ export default function AdminView() {
 
     showConfirm('Gỡ 1 tấm ảnh', 'Bạn xác nhận xóa tấm ảnh này khỏi album chứ?', async () => {
         const newImages = project.images.filter((_, idx) => idx !== imageIndexToRemove);
-        await updateDoc(doc(db, 'projects', project.id), { images: newImages });
+        await updateDoc(doc(db, 'projects_en', project.id), { images: newImages });
         setEditingProject({ ...project, images: newImages });
         setSelectedImageIndexes(prev => prev.filter(idx => idx !== imageIndexToRemove).map(idx => idx > imageIndexToRemove ? idx - 1 : idx));
     });
@@ -336,13 +336,13 @@ export default function AdminView() {
       const targetProject = projects.find(p => p.id === targetProjectId);
       const newTargetImages = [...(targetProject.images || []), ...urlsToMove];
       
-      await updateDoc(doc(db, 'projects', targetProjectId), { images: newTargetImages });
+      await updateDoc(doc(db, 'projects_en', targetProjectId), { images: newTargetImages });
       
       if (newCurrentImages.length === 0) {
-         await deleteDoc(doc(db, 'projects', editingProject.id));
+         await deleteDoc(doc(db, 'projects_en', editingProject.id));
          setEditingProject(null);
       } else {
-         await updateDoc(doc(db, 'projects', editingProject.id), { images: newCurrentImages });
+         await updateDoc(doc(db, 'projects_en', editingProject.id), { images: newCurrentImages });
          setEditingProject({ ...editingProject, images: newCurrentImages });
       }
       
@@ -358,13 +358,14 @@ export default function AdminView() {
   const handleSaveProfile = async () => {
      setSavingProfile(true);
      try {
-        await setDoc(doc(db, 'profile', 'main'), profileData);
+        await setDoc(doc(db, 'profile', 'english'), profileData);
         showAlert('Thành Công', 'Hồ sơ cá nhân và kỹ năng đã được cập nhật thành công!');
      } catch (e) {
         showAlert('Lỗi', 'Không thể lưu hồ sơ: ' + e);
      }
      setSavingProfile(false);
   };
+
 
   // Drag-and-drop: reorder images in array and save to Firestore
   const handleDragStart = useCallback((idx) => {
@@ -401,7 +402,7 @@ export default function AdminView() {
     const [moved] = newImages.splice(fromIdx, 1);
     newImages.splice(toIdx, 0, moved);
     setEditingProject({ ...editingProject, images: newImages });
-    await updateDoc(doc(db, 'projects', editingProject.id), { images: newImages });
+    await updateDoc(doc(db, 'projects_en', editingProject.id), { images: newImages });
   }, [editingProject]);
 
   const filterCategoriesMenu = ['All', ...new Set(projects.map(p => p.category))];
@@ -427,7 +428,7 @@ export default function AdminView() {
                 <Lock className="text-white/80" size={24} />
               </div>
               <div className="text-center">
-                <h1 className="text-2xl font-semibold tracking-tight text-white uppercase">PORTFOLIO ĐỖ VĂN NĂNG</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-white uppercase">PORTFOLIO DO VAN NANG</h1>
                 <p className="text-white/40 text-sm mt-1">Vui lòng đăng nhập để tiếp tục</p>
               </div>
             </div>
@@ -527,7 +528,7 @@ export default function AdminView() {
                     Overview.
                   </h1>
                   <p className="text-white/40 text-sm md:text-base font-medium leading-relaxed">
-                    Hệ thống đang hoạt động ổn định. Portfolio của bạn đã được quản lý và tối ưu hóa cho mọi thiết bị hiển thị.
+                    System is running stably. Your portfolio is managed and optimized across all displays.
                   </p>
                 </div>
                 
@@ -697,7 +698,7 @@ export default function AdminView() {
                        <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-5 border border-white/5">
                           <ImageIcon size={28} className="opacity-40" />
                        </div>
-                       <p className="font-bold text-sm uppercase tracking-widest">Kho Trống</p>
+                       <p className="font-bold text-sm uppercase tracking-widest">Empty Archive</p>
                      </div>
                    )}
                  </section>
@@ -716,7 +717,7 @@ export default function AdminView() {
                    <h2 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-white">
                      Hồ Sơ Năng Lực.
                    </h2>
-                   <p className="text-white/40 text-sm md:text-base font-medium max-w-xl leading-relaxed">Quản lý nội dung, kinh nghiệm làm việc và các chỉ số nổi bật của bạn. Mọi thay đổi sẽ lập tức hiển thị trên trang Portfolio chính.</p>
+                   <p className="text-white/40 text-sm md:text-base font-medium max-w-xl leading-relaxed">Manage your professional experience, technical skills, and key statistics. All changes sync seamlessly to your live portfolio.</p>
                  </div>
                  <button onClick={handleSaveProfile} disabled={savingProfile} className={`w-full md:w-auto px-8 py-4 rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 text-xs shadow-2xl ${savingProfile ? 'bg-[#1a1a1a] text-white/50 cursor-not-allowed border border-white/10' : 'bg-white text-black hover:bg-white/90 active:scale-[0.98]'}`}>
                    {savingProfile ? (
@@ -742,7 +743,7 @@ export default function AdminView() {
                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2"><Briefcase size={20} className="text-white/80"/> Kinh Nghiệm Làm Việc</h3>
                     <button 
-                       onClick={() => setProfileData({...profileData, experience: [...(profileData.experience || []), {startDate: '2024-01', endDate: '', isCurrent: true, role: 'Vị trí mới', desc: 'Mô tả công việc'}]})}
+                       onClick={() => setProfileData({...profileData, experience: [...(profileData.experience || []), {startDate: '2024-01', endDate: '', isCurrent: true, role: 'New Role', desc: 'Job Description'}]})}
                        className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-widest hover:bg-white/10 shadow-sm"
                     >
                       <PlusCircle size={16}/> Thêm Kinh Nghiệm
@@ -751,7 +752,7 @@ export default function AdminView() {
                  
                  <div className="flex flex-col gap-4">
                     {!(profileData.experience && profileData.experience.length > 0) ? (
-                       <p className="text-center text-white/40 py-6 border border-dashed border-white/10 rounded-2xl">Chưa cấu hình mốc kinh nghiệm, hãy bấm nút Thêm!</p>
+                       <p className="text-center text-white/40 py-6 border border-dashed border-white/10 rounded-2xl">No experience configured yet, click Add!</p>
                     ) : profileData.experience.map((exp, idx) => (
                       <div key={idx} className="flex flex-col gap-3 bg-[#1a1a1a] p-5 md:p-6 rounded-2xl border border-white/5 relative group/exp hover:border-white/20 transition-all shadow-sm mt-4 md:mt-0">
                         {/* Mobile Header with Trash */}
@@ -821,7 +822,7 @@ export default function AdminView() {
                                   onChange={(e) => {
                                     const arr = [...profileData.experience]; arr[idx].role = e.target.value; setProfileData({...profileData, experience: arr});
                                   }} 
-                                  placeholder="VD: Senior Graphic Designer"
+                                  placeholder="e.g. Senior Graphic Designer"
                                   className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-white/30 w-full outline-none focus:bg-[#1a1a1a] transition-all" 
                                />
                              </div>
@@ -832,7 +833,7 @@ export default function AdminView() {
                                   onChange={(e) => {
                                     const arr = [...profileData.experience]; arr[idx].company = e.target.value; setProfileData({...profileData, experience: arr});
                                   }} 
-                                  placeholder="VD: Google, Upwork, Freelance..."
+                                  placeholder="e.g. Google, Upwork, Freelance..."
                                   className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-white/30 w-full outline-none focus:bg-[#1a1a1a] transition-all" 
                                />
                              </div>
@@ -846,7 +847,7 @@ export default function AdminView() {
                                 return (
                                 <div key={lineIdx} className="flex gap-2 items-start group/inp">
                                    <div className="w-1.5 h-1.5 rounded-sm bg-white/20 group-focus-within/inp:bg-white group-focus-within/inp:rotate-45 transition-all shrink-0 mt-2.5" />
-                                   <textarea rows="2" value={rawText} onChange={(e) => { const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines[lineIdx] = e.target.value; arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); }} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines.splice(lineIdx + 1, 0, ''); arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); } else if (e.key === 'Backspace' && rawText === '' && (exp.desc || '').split('\n').length > 1) { e.preventDefault(); const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines.splice(lineIdx, 1); arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); } }} placeholder="Gõ chi tiết công việc... (Shift+Enter để xuống dòng)" className="bg-[#111] border border-white/10 text-white focus:border-white/30 px-4 py-2.5 rounded-xl text-sm w-full outline-none focus:bg-[#1a1a1a] transition-all resize-y" />
+                                   <textarea rows="2" value={rawText} onChange={(e) => { const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines[lineIdx] = e.target.value; arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); }} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines.splice(lineIdx + 1, 0, ''); arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); } else if (e.key === 'Backspace' && rawText === '' && (exp.desc || '').split('\n').length > 1) { e.preventDefault(); const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines.splice(lineIdx, 1); arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); } }} placeholder="Type job details... (Shift+Enter for new line)" className="bg-[#111] border border-white/10 text-white focus:border-white/30 px-4 py-2.5 rounded-xl text-sm w-full outline-none focus:bg-[#1a1a1a] transition-all resize-y" />
                                    <button onClick={() => { const arr = [...profileData.experience]; const lines = (exp.desc || '').split('\n'); lines.splice(lineIdx, 1); if(lines.length === 0) lines.push(''); arr[idx].desc = lines.join('\n'); setProfileData({...profileData, experience: arr}); }} className="text-white/20 hover:text-red-500 mt-1.5 px-1 pb-1">
                                      <Trash2 size={14} />
                                    </button>
@@ -1156,7 +1157,7 @@ export default function AdminView() {
                         onBlur={async (e) => {
                            const val = e.target.value.trim();
                            if (val) {
-                             await updateDoc(doc(db, 'projects', editingProject.id), { title: val });
+                             await updateDoc(doc(db, 'projects_en', editingProject.id), { title: val });
                            }
                         }}
                         className="text-2xl md:text-3xl font-bold bg-transparent outline-none border-b-2 border-transparent hover:border-white/20 focus:border-white/50 transition-colors w-full max-w-[500px] pb-1"
@@ -1170,7 +1171,7 @@ export default function AdminView() {
                         onChange={async (e) => {
                            const newCat = e.target.value;
                            setEditingProject({...editingProject, category: newCat});
-                           await updateDoc(doc(db, 'projects', editingProject.id), { category: newCat });
+                           await updateDoc(doc(db, 'projects_en', editingProject.id), { category: newCat });
                         }}
                         className="text-white/50 text-[10px] md:text-xs uppercase tracking-[0.3em] font-semibold bg-transparent outline-none cursor-pointer border-b border-transparent hover:border-white/20 focus:border-white/50 transition-colors appearance-none pb-0.5"
                         title="Nhấn để sửa danh mục"

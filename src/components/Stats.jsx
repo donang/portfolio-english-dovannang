@@ -28,10 +28,10 @@ export default function Stats() {
   }, []);
 
   const statsRender = [
-    { icon: <Star className="text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={26} />, value: statsData.years, label: 'Năm kinh nghiệm' },
-    { icon: <LayoutGrid className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={26} />, value: statsData.projects, label: 'Dự án hoàn thành' },
-    { icon: <Users className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.6)]" size={26} />, value: statsData.clients, label: 'Khách hàng' },
-    { icon: <ThumbsUp className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" size={26} />, value: statsData.awards, label: 'Đánh giá 5 sao' },
+    { icon: <Star className="text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]" size={26} />, value: statsData.years, label: 'Years Experience' },
+    { icon: <LayoutGrid className="text-primary drop-shadow-[0_0_10px_rgba(255,42,133,0.6)]" size={26} />, value: statsData.projects, label: 'Completed Projects' },
+    { icon: <Users className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.6)]" size={26} />, value: statsData.clients, label: 'Happy Clients' },
+    { icon: <ThumbsUp className="text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" size={26} />, value: statsData.awards, label: '5-Star Reviews' },
   ];
 
   return (
