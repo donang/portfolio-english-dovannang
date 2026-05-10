@@ -8,8 +8,8 @@ const Header = () => {
   const handleDownloadCV = (e) => {
     e.preventDefault();
     const link = document.createElement('a');
-    link.href = `${import.meta.env.BASE_URL}CV_Do_Van_Nang.pdf`;
-    link.download = 'CV_Do_Van_Nang.pdf';
+    link.href = `${import.meta.env.BASE_URL}CV_Do_Van_Nang_EN.pdf`;
+    link.download = 'CV_Do_Van_Nang_EN.pdf';
     link.click();
   };
 
