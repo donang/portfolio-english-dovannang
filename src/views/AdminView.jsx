@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Upload, Lock, AlertCircle, CheckCircle2, Image as ImageIcon, Trash2, LayoutDashboard, Settings as SettingsIcon, LogOut, BarChart3, FolderHeart, ImageIcon as MImageIcon, ChevronDown, ChevronLeft, ChevronRight, User, PlusCircle, Save, Briefcase, Calendar, MessageCircle, ArrowLeft, ArrowRight, Star, GripVertical } from 'lucide-react';
+import { Upload, Lock, AlertCircle, CheckCircle2, Image as ImageIcon, Trash2, LayoutDashboard, Settings as SettingsIcon, LogOut, BarChart3, FolderHeart, ImageIcon as MImageIcon, ChevronDown, ChevronLeft, ChevronRight, User, PlusCircle, Save, Briefcase, Calendar, MessageCircle, ArrowLeft, ArrowRight, Star, GripVertical, Globe } from 'lucide-react';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, updateDoc, where, setDoc, getDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from '../firebase';
@@ -55,6 +55,11 @@ export default function AdminView() {
   const [activeTab, setActiveTab] = useState('portfolio'); // 'portfolio' | 'profile'
   const [activeProfileTab, setActiveProfileTab] = useState('experience');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  // Language switcher: 'en' = English, 'vi' = Vietnamese
+  const [adminLang, setAdminLang] = useState('en');
+  const projectsCol = adminLang === 'en' ? 'projects_en' : 'projects';
+  const profileDocId = adminLang === 'en' ? 'english' : 'main';
   
   const [profileData, setProfileData] = useState({
     experience: [],
@@ -104,7 +109,11 @@ export default function AdminView() {
   useEffect(() => {
     if (!isAuthenticated) return;
     
-    const qProjects = query(collection(db, 'projects_en'), orderBy('createdAt', 'desc'));
+    // Reset state when switching language
+    setEditingProject(null);
+    setSelectedImageIndexes([]);
+    
+    const qProjects = query(collection(db, projectsCol), orderBy('createdAt', 'desc'));
     const unsubProjects = onSnapshot(qProjects, (snapshot) => {
       const projs = [];
       snapshot.forEach((dt) => {
@@ -113,7 +122,7 @@ export default function AdminView() {
       setProjects(projs);
     });
 
-    const unsubProfile = onSnapshot(doc(db, 'profile', 'english'), (docSnap) => {
+    const unsubProfile = onSnapshot(doc(db, 'profile', profileDocId), (docSnap) => {
         if (docSnap.exists()) {
             const dbData = docSnap.data();
             if (!dbData.faqs || dbData.faqs.length === 0) {
@@ -124,7 +133,7 @@ export default function AdminView() {
     });
 
     return () => { unsubProjects(); unsubProfile(); };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, adminLang]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -209,7 +218,7 @@ export default function AdminView() {
           }
   
           const newlyMergedImages = [...oldImages, ...uploadedUrls];
-          await updateDoc(doc(db, 'projects_en', project.id), { images: newlyMergedImages });
+          await updateDoc(doc(db, projectsCol, project.id), { images: newlyMergedImages });
           setEditingProject({ ...project, images: newlyMergedImages });
   
           setProgress(100);
@@ -251,7 +260,7 @@ export default function AdminView() {
         setProgress(90);
 
         const projectTitleTerm = projectTitle || 'Không tên';
-        const qSearch = query(collection(db, 'projects_en'), where('title', '==', projectTitleTerm));
+        const qSearch = query(collection(db, projectsCol), where('title', '==', projectTitleTerm));
         const querySnapshot = await getDocs(qSearch);
 
         let projectToEdit = null;
@@ -266,7 +275,7 @@ export default function AdminView() {
                 oldImages = [existingData.imageUrl];
             }
             const newlyMergedImages = [...oldImages, ...uploadedUrls];
-            await updateDoc(doc(db, 'projects_en', existingDoc.id), { images: newlyMergedImages });
+            await updateDoc(doc(db, projectsCol, existingDoc.id), { images: newlyMergedImages });
             projectToEdit = { id: existingDoc.id, ...existingData, images: newlyMergedImages };
         } else {
             const newProjectData = {
@@ -275,7 +284,7 @@ export default function AdminView() {
                 images: uploadedUrls,
                 createdAt: new Date().getTime()
             };
-            const newDocRef = await addDoc(collection(db, 'projects_en'), newProjectData);
+            const newDocRef = await addDoc(collection(db, projectsCol), newProjectData);
             projectToEdit = { id: newDocRef.id, ...newProjectData };
         }
 
@@ -297,7 +306,7 @@ export default function AdminView() {
 
   const handleDelete = (id) => {
     showConfirm('Xác nhận xóa dự án', 'Bạn có chắc chắn muốn xóa toàn bộ dự án này cùng tất cả ảnh trong đó không? Hành động này không thể hoàn tác.', async () => {
-      await deleteDoc(doc(db, 'projects_en', id));
+      await deleteDoc(doc(db, projectsCol, id));
       if (editingProject && editingProject.id === id) setEditingProject(null);
     });
   };
@@ -305,7 +314,7 @@ export default function AdminView() {
   const handleRemoveSingleImage = async (project, imageIndexToRemove) => {
     if (!project.images || project.images.length <= 1) {
        showConfirm('Xóa ảnh cuối cùng', 'Đây là bức ảnh cuối cùng của dự án. Nếu xóa, toàn bộ bìa dự án này sẽ biến mất. Bạn vẫn muốn tiếp tục?', async () => {
-           await deleteDoc(doc(db, 'projects_en', project.id));
+           await deleteDoc(doc(db, projectsCol, project.id));
            setEditingProject(null);
        });
        return;
@@ -313,7 +322,7 @@ export default function AdminView() {
 
     showConfirm('Gỡ 1 tấm ảnh', 'Bạn xác nhận xóa tấm ảnh này khỏi album chứ?', async () => {
         const newImages = project.images.filter((_, idx) => idx !== imageIndexToRemove);
-        await updateDoc(doc(db, 'projects_en', project.id), { images: newImages });
+        await updateDoc(doc(db, projectsCol, project.id), { images: newImages });
         setEditingProject({ ...project, images: newImages });
         setSelectedImageIndexes(prev => prev.filter(idx => idx !== imageIndexToRemove).map(idx => idx > imageIndexToRemove ? idx - 1 : idx));
     });
@@ -336,13 +345,13 @@ export default function AdminView() {
       const targetProject = projects.find(p => p.id === targetProjectId);
       const newTargetImages = [...(targetProject.images || []), ...urlsToMove];
       
-      await updateDoc(doc(db, 'projects_en', targetProjectId), { images: newTargetImages });
+      await updateDoc(doc(db, projectsCol, targetProjectId), { images: newTargetImages });
       
       if (newCurrentImages.length === 0) {
-         await deleteDoc(doc(db, 'projects_en', editingProject.id));
+         await deleteDoc(doc(db, projectsCol, editingProject.id));
          setEditingProject(null);
       } else {
-         await updateDoc(doc(db, 'projects_en', editingProject.id), { images: newCurrentImages });
+         await updateDoc(doc(db, projectsCol, editingProject.id), { images: newCurrentImages });
          setEditingProject({ ...editingProject, images: newCurrentImages });
       }
       
@@ -358,7 +367,7 @@ export default function AdminView() {
   const handleSaveProfile = async () => {
      setSavingProfile(true);
      try {
-        await setDoc(doc(db, 'profile', 'english'), profileData);
+         await setDoc(doc(db, 'profile', profileDocId), profileData);
         showAlert('Thành Công', 'Hồ sơ cá nhân và kỹ năng đã được cập nhật thành công!');
      } catch (e) {
         showAlert('Lỗi', 'Không thể lưu hồ sơ: ' + e);
@@ -402,7 +411,7 @@ export default function AdminView() {
     const [moved] = newImages.splice(fromIdx, 1);
     newImages.splice(toIdx, 0, moved);
     setEditingProject({ ...editingProject, images: newImages });
-    await updateDoc(doc(db, 'projects_en', editingProject.id), { images: newImages });
+    await updateDoc(doc(db, projectsCol, editingProject.id), { images: newImages });
   }, [editingProject]);
 
   const filterCategoriesMenu = ['All', ...new Set(projects.map(p => p.category))];
@@ -508,12 +517,32 @@ export default function AdminView() {
            >
              <User size={14} className="shrink-0" /> <span className="hidden sm:inline">Hồ Sơ Năng Lực</span>
            </button>
-        </div>
-        
-        <button onClick={handleLogout} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-2 transition-colors px-2 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
-          <span className="hidden sm:inline">Đăng Xuất</span> <LogOut size={16} className="shrink-0" />
-        </button>
-      </nav>
+         </div>
+         
+         <div className="flex items-center gap-2">
+           {/* Language Switcher */}
+           <div className="flex items-center gap-0.5 p-0.5 bg-white/5 border border-white/10 rounded-lg">
+              <button 
+                 onClick={() => setAdminLang('vi')} 
+                 className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1.5 ${adminLang === 'vi' ? 'bg-gradient-to-r from-red-500 to-yellow-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+              >
+                <svg width="16" height="11" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#DA251D"/><polygon points="15,3 16.8,9.2 23.3,9.2 18.2,12.8 20,19 15,15.4 10,19 11.8,12.8 6.7,9.2 13.2,9.2" fill="#FFFF00"/></svg>
+                VN
+              </button>
+              <button 
+                 onClick={() => setAdminLang('en')} 
+                 className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1.5 ${adminLang === 'en' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+              >
+                <svg width="16" height="11" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#B22234"/><rect y="1.54" width="30" height="1.54" fill="white"/><rect y="4.62" width="30" height="1.54" fill="white"/><rect y="7.69" width="30" height="1.54" fill="white"/><rect y="10.77" width="30" height="1.54" fill="white"/><rect y="13.85" width="30" height="1.54" fill="white"/><rect y="16.92" width="30" height="1.54" fill="white"/><rect width="12" height="10.77" fill="#3C3B6E"/><circle cx="2" cy="1.5" r="0.6" fill="white"/><circle cx="4" cy="1.5" r="0.6" fill="white"/><circle cx="6" cy="1.5" r="0.6" fill="white"/><circle cx="8" cy="1.5" r="0.6" fill="white"/><circle cx="10" cy="1.5" r="0.6" fill="white"/><circle cx="3" cy="3" r="0.6" fill="white"/><circle cx="5" cy="3" r="0.6" fill="white"/><circle cx="7" cy="3" r="0.6" fill="white"/><circle cx="9" cy="3" r="0.6" fill="white"/><circle cx="2" cy="4.5" r="0.6" fill="white"/><circle cx="4" cy="4.5" r="0.6" fill="white"/><circle cx="6" cy="4.5" r="0.6" fill="white"/><circle cx="8" cy="4.5" r="0.6" fill="white"/><circle cx="10" cy="4.5" r="0.6" fill="white"/><circle cx="3" cy="6" r="0.6" fill="white"/><circle cx="5" cy="6" r="0.6" fill="white"/><circle cx="7" cy="6" r="0.6" fill="white"/><circle cx="9" cy="6" r="0.6" fill="white"/><circle cx="2" cy="7.5" r="0.6" fill="white"/><circle cx="4" cy="7.5" r="0.6" fill="white"/><circle cx="6" cy="7.5" r="0.6" fill="white"/><circle cx="8" cy="7.5" r="0.6" fill="white"/><circle cx="10" cy="7.5" r="0.6" fill="white"/><circle cx="3" cy="9" r="0.6" fill="white"/><circle cx="5" cy="9" r="0.6" fill="white"/><circle cx="7" cy="9" r="0.6" fill="white"/><circle cx="9" cy="9" r="0.6" fill="white"/></svg>
+                EN
+              </button>
+           </div>
+
+           <button onClick={handleLogout} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-2 transition-colors px-2 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
+             <span className="hidden sm:inline">Đăng Xuất</span> <LogOut size={16} className="shrink-0" />
+           </button>
+         </div>
+       </nav>
 
       {/* Main Content Workspace */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden relative z-10 w-full h-screen pt-24 pb-12 custom-scrollbar">
@@ -526,6 +555,12 @@ export default function AdminView() {
                 <div className="flex flex-col gap-3 max-w-2xl">
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white break-words">
                     Overview.
+                    <span className={`ml-3 text-sm font-bold px-4 py-1.5 rounded-lg align-middle inline-flex items-center gap-2 tracking-normal ${adminLang === 'en' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'}`}>
+                      {adminLang === 'en' 
+                        ? <><svg width="18" height="12" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#B22234"/><rect y="1.54" width="30" height="1.54" fill="white"/><rect y="4.62" width="30" height="1.54" fill="white"/><rect y="7.69" width="30" height="1.54" fill="white"/><rect y="10.77" width="30" height="1.54" fill="white"/><rect y="13.85" width="30" height="1.54" fill="white"/><rect y="16.92" width="30" height="1.54" fill="white"/><rect width="12" height="10.77" fill="#3C3B6E"/></svg> English Version</>
+                        : <><svg width="18" height="12" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#DA251D"/><polygon points="15,3 16.8,9.2 23.3,9.2 18.2,12.8 20,19 15,15.4 10,19 11.8,12.8 6.7,9.2 13.2,9.2" fill="#FFFF00"/></svg> Bản Tiếng Việt</>
+                      }
+                    </span>
                   </h1>
                   <p className="text-white/40 text-sm md:text-base font-medium leading-relaxed">
                     System is running stably. Your portfolio is managed and optimized across all displays.
@@ -1157,7 +1192,7 @@ export default function AdminView() {
                         onBlur={async (e) => {
                            const val = e.target.value.trim();
                            if (val) {
-                             await updateDoc(doc(db, 'projects_en', editingProject.id), { title: val });
+                             await updateDoc(doc(db, projectsCol, editingProject.id), { title: val });
                            }
                         }}
                         className="text-2xl md:text-3xl font-bold bg-transparent outline-none border-b-2 border-transparent hover:border-white/20 focus:border-white/50 transition-colors w-full max-w-[500px] pb-1"
@@ -1171,7 +1206,7 @@ export default function AdminView() {
                         onChange={async (e) => {
                            const newCat = e.target.value;
                            setEditingProject({...editingProject, category: newCat});
-                           await updateDoc(doc(db, 'projects_en', editingProject.id), { category: newCat });
+                           await updateDoc(doc(db, projectsCol, editingProject.id), { category: newCat });
                         }}
                         className="text-white/50 text-[10px] md:text-xs uppercase tracking-[0.3em] font-semibold bg-transparent outline-none cursor-pointer border-b border-transparent hover:border-white/20 focus:border-white/50 transition-colors appearance-none pb-0.5"
                         title="Nhấn để sửa danh mục"
