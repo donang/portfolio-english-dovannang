@@ -495,8 +495,8 @@ export default function AdminView() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-white/[0.02] blur-[120px] rounded-full pointer-events-none"></div>
 
       {/* Top Navigation Bar (Sleek, Modern) */}
-      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-black/50 backdrop-blur-2xl z-50 flex items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-3">
+      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-black/50 backdrop-blur-2xl z-50 flex items-center justify-between px-2 md:px-8 gap-1 md:gap-4">
+        <div className="flex items-center gap-3 shrink-0 z-10">
            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)] shrink-0">
              <Star className="text-black" size={16} fill="currentColor"/>
            </div>
@@ -504,41 +504,43 @@ export default function AdminView() {
         </div>
         
         {/* Center Pill Navigation */}
-        <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-xl absolute left-1/2 -translate-x-1/2">
-           <button 
-              onClick={() => setActiveTab('portfolio')} 
-              className={`px-4 md:px-6 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'portfolio' ? 'bg-white text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
-           >
-             <LayoutDashboard size={14} className="shrink-0" /> <span className="hidden sm:inline">Kho Tác Phẩm</span>
-           </button>
-           <button 
-              onClick={() => setActiveTab('profile')} 
-              className={`px-4 md:px-6 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'profile' ? 'bg-white text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
-           >
-             <User size={14} className="shrink-0" /> <span className="hidden sm:inline">Hồ Sơ Năng Lực</span>
-           </button>
+        <div className="flex items-center justify-center flex-1 md:absolute md:left-1/2 md:-translate-x-1/2 z-0">
+          <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-xl">
+             <button 
+                onClick={() => setActiveTab('portfolio')} 
+                className={`px-3 md:px-6 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'portfolio' ? 'bg-white text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
+             >
+               <LayoutDashboard size={14} className="shrink-0" /> <span className="hidden sm:inline">Kho Tác Phẩm</span>
+             </button>
+             <button 
+                onClick={() => setActiveTab('profile')} 
+                className={`px-3 md:px-6 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'profile' ? 'bg-white text-black shadow-lg' : 'text-white/50 hover:text-white'}`}
+             >
+               <User size={14} className="shrink-0" /> <span className="hidden sm:inline">Hồ Sơ Năng Lực</span>
+             </button>
+           </div>
          </div>
          
-         <div className="flex items-center gap-2">
+         <div className="flex items-center gap-1 md:gap-2 shrink-0 z-10">
            {/* Language Switcher */}
            <div className="flex items-center gap-0.5 p-0.5 bg-white/5 border border-white/10 rounded-lg">
               <button 
                  onClick={() => setAdminLang('vi')} 
-                 className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1.5 ${adminLang === 'vi' ? 'bg-gradient-to-r from-red-500 to-yellow-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                 className={`px-1.5 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1 md:gap-1.5 ${adminLang === 'vi' ? 'bg-gradient-to-r from-red-500 to-yellow-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
               >
                 <svg width="16" height="11" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#DA251D"/><polygon points="15,3 16.8,9.2 23.3,9.2 18.2,12.8 20,19 15,15.4 10,19 11.8,12.8 6.7,9.2 13.2,9.2" fill="#FFFF00"/></svg>
                 VN
               </button>
               <button 
                  onClick={() => setAdminLang('en')} 
-                 className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1.5 ${adminLang === 'en' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                 className={`px-1.5 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold transition-all flex items-center gap-1 md:gap-1.5 ${adminLang === 'en' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
               >
                 <svg width="16" height="11" viewBox="0 0 30 20" className="rounded-[2px] shrink-0"><rect width="30" height="20" fill="#B22234"/><rect y="1.54" width="30" height="1.54" fill="white"/><rect y="4.62" width="30" height="1.54" fill="white"/><rect y="7.69" width="30" height="1.54" fill="white"/><rect y="10.77" width="30" height="1.54" fill="white"/><rect y="13.85" width="30" height="1.54" fill="white"/><rect y="16.92" width="30" height="1.54" fill="white"/><rect width="12" height="10.77" fill="#3C3B6E"/><circle cx="2" cy="1.5" r="0.6" fill="white"/><circle cx="4" cy="1.5" r="0.6" fill="white"/><circle cx="6" cy="1.5" r="0.6" fill="white"/><circle cx="8" cy="1.5" r="0.6" fill="white"/><circle cx="10" cy="1.5" r="0.6" fill="white"/><circle cx="3" cy="3" r="0.6" fill="white"/><circle cx="5" cy="3" r="0.6" fill="white"/><circle cx="7" cy="3" r="0.6" fill="white"/><circle cx="9" cy="3" r="0.6" fill="white"/><circle cx="2" cy="4.5" r="0.6" fill="white"/><circle cx="4" cy="4.5" r="0.6" fill="white"/><circle cx="6" cy="4.5" r="0.6" fill="white"/><circle cx="8" cy="4.5" r="0.6" fill="white"/><circle cx="10" cy="4.5" r="0.6" fill="white"/><circle cx="3" cy="6" r="0.6" fill="white"/><circle cx="5" cy="6" r="0.6" fill="white"/><circle cx="7" cy="6" r="0.6" fill="white"/><circle cx="9" cy="6" r="0.6" fill="white"/><circle cx="2" cy="7.5" r="0.6" fill="white"/><circle cx="4" cy="7.5" r="0.6" fill="white"/><circle cx="6" cy="7.5" r="0.6" fill="white"/><circle cx="8" cy="7.5" r="0.6" fill="white"/><circle cx="10" cy="7.5" r="0.6" fill="white"/><circle cx="3" cy="9" r="0.6" fill="white"/><circle cx="5" cy="9" r="0.6" fill="white"/><circle cx="7" cy="9" r="0.6" fill="white"/><circle cx="9" cy="9" r="0.6" fill="white"/></svg>
                 EN
               </button>
            </div>
 
-           <button onClick={handleLogout} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-2 transition-colors px-2 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
+           <button onClick={handleLogout} className="text-white/40 hover:text-red-400 text-xs md:text-sm font-semibold flex items-center gap-1 md:gap-2 transition-colors px-1.5 md:px-3 py-1.5 rounded-lg hover:bg-red-500/10">
              <span className="hidden sm:inline">Đăng Xuất</span> <LogOut size={16} className="shrink-0" />
            </button>
          </div>
